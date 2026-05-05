@@ -1,0 +1,2554 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="MyFlower" />
+  <title>MyFlower – Ton cycle, ta vie</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;0,900;1,500;1,700&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --rose: #f2a7bb;
+      --rose-deep: #e07094;
+      --mauve: #c9a0c0;
+      --mauve-light: #e8d4e5;
+      --blush: #fce8ef;
+      --cream: #fdf6f9;
+      --plum: #6b3a5e;
+      --plum-light: #9a5a8a;
+      --text: #3d1f35;
+      --text-muted: #9a7a90;
+      --white: #ffffff;
+      --shadow: 0 8px 32px rgba(107,58,94,0.12);
+      --shadow-sm: 0 2px 12px rgba(107,58,94,0.08);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: var(--cream);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ---- BACKGROUND ---- */
+    .bg-orbs {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden;
+    }
+    .orb {
+      position: absolute; border-radius: 50%; filter: blur(60px); opacity: 0.35;
+    }
+    .orb1 { width: 300px; height: 300px; background: var(--rose); top: -80px; right: -60px; animation: float1 8s ease-in-out infinite; }
+    .orb2 { width: 200px; height: 200px; background: var(--mauve); bottom: 20%; left: -60px; animation: float2 10s ease-in-out infinite; }
+    .orb3 { width: 150px; height: 150px; background: var(--rose-deep); bottom: -40px; right: 20%; animation: float1 12s ease-in-out infinite reverse; }
+
+    @keyframes float1 { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-20px)} }
+    @keyframes float2 { 0%,100%{transform:translateY(0)} 50%{transform:translateY(15px)} }
+
+    /* ---- LAYOUT ---- */
+    .app { position: relative; z-index: 1; max-width: 430px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; }
+
+    /* ---- HEADER ---- */
+    .header {
+      padding: 52px 24px 20px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem; font-weight: 700; color: var(--plum);
+      letter-spacing: 0.02em;
+    }
+    .logo span { font-style: italic; color: var(--rose-deep); }
+    .profile-btn {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--rose), var(--mauve));
+      border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; box-shadow: var(--shadow-sm);
+    }
+
+    /* ---- NAV ---- */
+    .nav {
+      display: flex; gap: 8px; padding: 0 24px 20px;
+    }
+    .nav-btn {
+      flex: 1; padding: 10px 6px; border: none; border-radius: 14px; cursor: pointer;
+      font-family: 'Nunito', sans-serif; font-size: 0.78rem; font-weight: 700;
+      transition: all 0.25s ease; background: var(--white); color: var(--text-muted);
+      box-shadow: var(--shadow-sm);
+    }
+    .nav-btn.active {
+      background: linear-gradient(135deg, var(--plum), var(--plum-light));
+      color: var(--white); box-shadow: 0 4px 16px rgba(107,58,94,0.3);
+    }
+    .nav-btn .icon { display: block; font-size: 1.2rem; margin-bottom: 2px; }
+
+    /* ---- SCREENS ---- */
+    .screen { display: none; flex-direction: column; gap: 20px; padding: 0 24px 100px; animation: fadeUp 0.35s ease; }
+    .screen.active { display: flex; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+
+    /* ---- CARDS ---- */
+    .card {
+      background: var(--white); border-radius: 24px; padding: 22px;
+      box-shadow: var(--shadow-sm);
+    }
+    .card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem; font-weight: 700; color: var(--plum); margin-bottom: 14px;
+    }
+
+    /* ---- CYCLE HERO ---- */
+    .cycle-hero {
+      background: linear-gradient(145deg, var(--plum), #8a3070);
+      border-radius: 36px 36px 120px 120px / 36px 36px 80px 80px;
+      padding: 32px 28px 44px;
+      color: var(--white); position: relative; overflow: hidden;
+      margin: 0 -4px;
+      box-shadow: 0 16px 48px rgba(107,58,94,0.3);
+    }
+    .cycle-hero::before {
+      content: ''; position: absolute; top: -60px; right: -50px;
+      width: 200px; height: 200px; border-radius: 50%;
+      background: rgba(255,255,255,0.06);
+    }
+    .cycle-hero::after {
+      content: ''; position: absolute; bottom: -50px; left: -30px;
+      width: 160px; height: 160px; border-radius: 50%;
+      background: rgba(255,255,255,0.04);
+    }
+    /* petal decorations */
+    .cycle-hero .petal1 {
+      position: absolute; top: 10px; left: -20px;
+      width: 120px; height: 120px;
+      border-radius: 60% 40% 70% 30% / 50% 60% 40% 50%;
+      background: rgba(255,255,255,0.05);
+      transform: rotate(-30deg);
+    }
+    .cycle-hero .petal2 {
+      position: absolute; bottom: 20px; right: -15px;
+      width: 90px; height: 90px;
+      border-radius: 40% 60% 30% 70% / 60% 40% 60% 40%;
+      background: rgba(255,255,255,0.06);
+      transform: rotate(20deg);
+    }
+    .cycle-label { font-size: 0.78rem; opacity: 0.75; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 6px; font-weight: 600; }
+    .cycle-phase { font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 700; margin-bottom: 4px; }
+    .cycle-sub { font-size: 0.88rem; opacity: 0.85; font-weight: 500; }
+    .cycle-ring-wrap { display: flex; justify-content: center; margin: 20px 0 10px; }
+    svg.ring { transform: rotate(-90deg); }
+    .ring-bg { fill: none; stroke: rgba(255,255,255,0.15); stroke-width: 10; }
+    .ring-fill { fill: none; stroke: var(--rose); stroke-width: 10; stroke-linecap: round; transition: stroke-dashoffset 1s ease; }
+    .ring-center { position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center; inset: 0; color: white; }
+    .ring-day { font-family: 'Playfair Display', serif; font-size: 2.8rem; font-weight: 700; line-height: 1; }
+    .ring-total { font-size: 0.75rem; opacity: 0.7; }
+    .ring-container { position: relative; width: 140px; height: 140px; }
+    .cycle-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+    .cycle-tag {
+      background: rgba(255,255,255,0.15); border-radius: 20px;
+      padding: 4px 12px; font-size: 0.75rem;
+    }
+
+    /* ---- PHASE TIMELINE ---- */
+    .phase-row { display: flex; gap: 8px; }
+    .phase-item {
+      flex: 1; border-radius: 16px; padding: 12px 8px; text-align: center;
+      background: var(--cream); transition: transform 0.2s ease;
+    }
+    .phase-item.current { background: linear-gradient(135deg, var(--blush), var(--mauve-light)); }
+    .phase-item .p-icon { font-size: 1.3rem; margin-bottom: 4px; }
+    .phase-item .p-name { font-size: 0.68rem; font-weight: 500; color: var(--plum); }
+    .phase-item .p-days { font-size: 0.62rem; color: var(--text-muted); }
+
+    /* ---- SYMPTOMS ---- */
+    .symptom-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+    .symptom-btn {
+      border: 1.5px solid var(--mauve-light); border-radius: 16px; padding: 12px 6px;
+      background: var(--white); cursor: pointer; text-align: center; transition: all 0.2s ease;
+      font-family: 'Nunito', sans-serif;
+    }
+    .symptom-btn.selected { background: var(--blush); border-color: var(--rose-deep); }
+    .symptom-btn .s-icon { font-size: 1.4rem; }
+    .symptom-btn .s-label { font-size: 0.7rem; color: var(--text-muted); display: block; margin-top: 3px; }
+    .symptom-btn.selected .s-label { color: var(--plum); }
+
+    /* ---- MOOD ---- */
+    .mood-row { display: flex; justify-content: space-between; }
+    .mood-btn {
+      flex: 1; border: none; background: none; cursor: pointer; padding: 10px 4px;
+      border-radius: 14px; transition: background 0.2s; font-size: 1.6rem; text-align: center;
+    }
+    .mood-btn.active { background: var(--blush); }
+    .mood-label { font-size: 0.62rem; color: var(--text-muted); display: block; margin-top: 2px; font-family: 'Nunito', sans-serif; }
+
+    /* ---- CALENDAR ---- */
+    .cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .cal-nav { background: none; border: none; cursor: pointer; font-size: 1.2rem; color: var(--plum); padding: 4px 10px; }
+    .cal-month { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 700; color: var(--plum); }
+    .cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 4px; }
+    .cal-dow { text-align: center; font-size: 0.65rem; color: var(--text-muted); font-weight: 500; padding: 4px 0; }
+    .cal-day {
+      aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+      border-radius: 50%; font-size: 0.8rem; cursor: pointer; transition: all 0.2s; position: relative;
+    }
+    .cal-day:hover { background: var(--mauve-light); }
+    .cal-day.today { font-weight: 700; color: var(--plum); }
+    .cal-day.period { background: linear-gradient(135deg, var(--rose), var(--rose-deep)); color: white; font-weight: 600; }
+    .cal-day.ovulation { background: linear-gradient(135deg, var(--mauve), var(--plum-light)); color: white; }
+    .cal-day.fertile { background: var(--mauve-light); color: var(--plum); }
+    .cal-day.predicted { border: 1.5px dashed var(--rose); color: var(--rose-deep); }
+    .cal-day.empty { cursor: default; }
+    .cal-legend { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 12px; }
+    .leg-item { display: flex; align-items: center; gap: 5px; font-size: 0.7rem; color: var(--text-muted); }
+    .leg-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+    /* ---- CONTRACEPTION ---- */
+    .contra-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .contra-btn {
+      border: 1.5px solid var(--mauve-light); border-radius: 18px; padding: 16px 12px;
+      background: var(--white); cursor: pointer; text-align: center; transition: all 0.2s;
+      font-family: 'Nunito', sans-serif;
+    }
+    .contra-btn.selected { background: linear-gradient(135deg, var(--blush), var(--mauve-light)); border-color: var(--mauve); }
+    .contra-btn .c-icon { font-size: 1.6rem; margin-bottom: 6px; }
+    .contra-btn .c-name { font-size: 0.78rem; font-weight: 500; color: var(--plum); }
+
+    /* ---- PILL REMINDER ---- */
+    .pill-reminder {
+      background: linear-gradient(135deg, var(--rose), var(--rose-deep));
+      border-radius: 20px; padding: 18px; display: flex; align-items: center; gap: 14px;
+    }
+    .pill-icon { font-size: 2rem; }
+    .pill-text h4 { color: white; font-size: 0.9rem; margin-bottom: 3px; }
+    .pill-text p { color: rgba(255,255,255,0.8); font-size: 0.78rem; }
+    .pill-check {
+      margin-left: auto; background: white; border: none; border-radius: 50%;
+      width: 36px; height: 36px; cursor: pointer; font-size: 1.1rem;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      transition: transform 0.2s;
+    }
+    .pill-check:active { transform: scale(0.9); }
+
+    /* ---- AI CHAT ---- */
+    .chat-area {
+      background: var(--cream); border-radius: 20px; min-height: 280px;
+      padding: 16px; display: flex; flex-direction: column; gap: 12px;
+      max-height: 380px; overflow-y: auto;
+    }
+    .msg {
+      max-width: 85%; border-radius: 18px; padding: 12px 16px; font-size: 0.85rem; line-height: 1.5;
+      animation: fadeUp 0.3s ease;
+    }
+    .msg.luna {
+      background: linear-gradient(135deg, var(--plum), var(--plum-light));
+      color: white; align-self: flex-start; border-bottom-left-radius: 4px;
+    }
+    .msg.luna .msg-name { font-size: 0.7rem; opacity: 0.7; margin-bottom: 4px; }
+    .msg.user { background: var(--white); color: var(--text); align-self: flex-end; border-bottom-right-radius: 4px; box-shadow: var(--shadow-sm); }
+    .chat-input-row { display: flex; gap: 10px; margin-top: 4px; }
+    .chat-input {
+      flex: 1; border: 1.5px solid var(--mauve-light); border-radius: 20px;
+      padding: 12px 16px; font-family: 'Nunito', sans-serif; font-size: 0.85rem;
+      background: var(--white); color: var(--text); outline: none;
+      transition: border-color 0.2s;
+    }
+    .chat-input:focus { border-color: var(--mauve); }
+    .send-btn {
+      width: 46px; height: 46px; border-radius: 50%; border: none; cursor: pointer;
+      background: linear-gradient(135deg, var(--plum), var(--plum-light));
+      color: white; font-size: 1.1rem; display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 14px rgba(107,58,94,0.3); transition: transform 0.2s;
+    }
+    .send-btn:active { transform: scale(0.92); }
+    .typing { display: flex; gap: 5px; align-items: center; padding: 6px 0; }
+    .typing span { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,0.6); animation: blink 1.2s infinite; }
+    .typing span:nth-child(2) { animation-delay: 0.2s; }
+    .typing span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes blink { 0%,80%,100%{opacity:0.3} 40%{opacity:1} }
+
+    /* ---- ONBOARDING ---- */
+    #onboarding {
+      position: fixed; inset: 0; z-index: 100;
+      background: linear-gradient(160deg, var(--plum) 0%, #8a3070 60%, var(--rose-deep) 100%);
+      display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+      padding: 48px 32px 60px; text-align: center; transition: opacity 0.5s ease;
+      overflow-y: scroll; -webkit-overflow-scrolling: touch;
+    }
+    #onboarding.hidden { opacity: 0; pointer-events: none; }
+    .ob-conception-row { display: flex; gap: 8px; margin-top: 4px; }
+    .ob-conception-btn {
+      flex: 1; border: 2px solid var(--mauve-light); border-radius: 14px;
+      padding: 10px 6px; background: white; cursor: pointer;
+      font-family: 'Nunito', sans-serif; font-size: 0.78rem; font-weight: 700;
+      color: var(--text-muted); transition: all 0.2s; text-align: center;
+      -webkit-appearance: none;
+    }
+    .ob-conception-btn.selected {
+      background: linear-gradient(135deg, var(--blush), var(--mauve-light));
+      border-color: var(--rose-deep); color: var(--plum);
+    }
+
+    /* ---- FERTILITY METER ---- */
+    .fertility-meter {
+      background: linear-gradient(135deg, #fff0f6, #f5e8ff);
+      border-radius: 18px; padding: 16px; margin-top: 12px;
+      border: 1px solid rgba(202,160,192,0.3);
+    }
+    .fertility-meter-label {
+      font-size: 0.72rem; font-weight: 700; color: var(--plum-light);
+      text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;
+    }
+    .fertility-meter-title {
+      font-family: 'Playfair Display', serif; font-size: 1rem;
+      font-weight: 700; color: var(--plum); margin-bottom: 10px;
+    }
+    .fertility-bar-wrap {
+      background: rgba(202,160,192,0.2); border-radius: 20px;
+      height: 12px; width: 100%; overflow: hidden; margin-bottom: 6px;
+    }
+    .fertility-bar {
+      height: 100%; border-radius: 20px;
+      transition: width 0.8s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .fertility-pct {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem; font-weight: 700; text-align: center;
+      margin: 4px 0 2px;
+    }
+    .fertility-pct-sub {
+      font-size: 0.75rem; color: var(--text-muted); text-align: center;
+      margin-bottom: 8px; line-height: 1.4;
+    }
+    .fertility-tip {
+      font-size: 0.78rem; color: var(--plum); line-height: 1.5;
+      background: rgba(255,255,255,0.6); border-radius: 12px; padding: 10px;
+    }
+    .ob-logo em { font-style: italic; color: var(--rose); }
+    .ob-tagline { color: rgba(255,255,255,0.75); font-size: 1rem; margin-bottom: 40px; }
+    .ob-card { background: white; border-radius: 24px; padding: 28px; width: 100%; max-width: 340px; margin-bottom: 20px; }
+    .ob-card h3 { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--plum); margin-bottom: 16px; font-weight: 700; }
+    .ob-field { margin-bottom: 14px; text-align: left; }
+    .ob-field label { font-size: 0.78rem; color: var(--text-muted); font-weight: 500; display: block; margin-bottom: 5px; }
+    .ob-field input, .ob-field select {
+      width: 100%; border: 1.5px solid var(--mauve-light); border-radius: 12px;
+      padding: 10px 14px; font-family: 'Nunito', sans-serif; font-size: 0.88rem;
+      background: var(--cream); color: var(--text); outline: none;
+    }
+    .ob-btn {
+      width: 100%; max-width: 340px; padding: 18px; border: none; border-radius: 16px; cursor: pointer;
+      background: linear-gradient(135deg, var(--rose), var(--rose-deep));
+      color: white; font-family: 'Nunito', sans-serif; font-size: 1rem; font-weight: 700;
+      box-shadow: 0 6px 20px rgba(224,112,148,0.4); transition: transform 0.2s;
+      margin-top: 8px; margin-bottom: 60px; display: block;
+      -webkit-appearance: none;
+    }
+    .ob-btn:active { transform: scale(0.97); }
+
+    /* ---- TIPS BANNER ---- */
+    .tip-banner {
+      background: linear-gradient(135deg, var(--mauve-light), var(--blush));
+      border-radius: 18px; padding: 16px; display: flex; align-items: flex-start; gap: 12px;
+      border-left: 4px solid var(--mauve);
+    }
+    .tip-icon { font-size: 1.4rem; flex-shrink: 0; }
+    .tip-text { font-size: 0.82rem; color: var(--plum); line-height: 1.5; }
+    .tip-title { font-weight: 600; margin-bottom: 3px; }
+
+    /* ---- STATS ---- */
+    .stats-row { display: flex; gap: 10px; }
+    .stat-box { flex: 1; background: var(--cream); border-radius: 16px; padding: 14px; text-align: center; }
+    .stat-num { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 600; color: var(--plum); line-height: 1; }
+    .stat-lbl { font-size: 0.7rem; color: var(--text-muted); margin-top: 3px; }
+
+    /* ---- BUTTONS ---- */
+    .btn-primary {
+      width: 100%; padding: 15px; border: none; border-radius: 16px; cursor: pointer;
+      background: linear-gradient(135deg, var(--plum), var(--plum-light));
+      color: white; font-family: 'Nunito', sans-serif; font-size: 0.95rem; font-weight: 700;
+      box-shadow: 0 4px 16px rgba(107,58,94,0.25); transition: transform 0.2s;
+    }
+    .btn-primary:active { transform: scale(0.97); }
+    .btn-outline {
+      width: 100%; padding: 14px; border: 1.5px solid var(--mauve); border-radius: 16px; cursor: pointer;
+      background: white; color: var(--plum); font-family: 'Nunito', sans-serif; font-size: 0.9rem; font-weight: 600;
+    }
+
+    /* ---- PERIOD LOG BTN ---- */
+    .log-period-btn {
+      background: linear-gradient(135deg, var(--rose), var(--rose-deep));
+      border: none; border-radius: 20px; padding: 16px; color: white;
+      font-family: 'Nunito', sans-serif; font-size: 0.95rem; font-weight: 700;
+      cursor: pointer; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;
+      box-shadow: 0 6px 18px rgba(224,112,148,0.35); transition: transform 0.2s;
+    }
+    .log-period-btn:active { transform: scale(0.97); }
+
+    /* ---- SECTION TITLE ---- */
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem; color: var(--plum); font-weight: 700; margin-bottom: 4px;
+    }
+    .section-sub { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px; }
+
+    /* ---- FLOW INTENSITY ---- */
+    .flow-row { display: flex; gap: 8px; }
+    .flow-btn {
+      flex: 1; border: 1.5px solid var(--mauve-light); border-radius: 14px; padding: 10px 4px;
+      background: white; cursor: pointer; text-align: center; font-size: 0.75rem;
+      color: var(--text-muted); transition: all 0.2s; font-family: 'Nunito', sans-serif;
+    }
+    .flow-btn .f-drop { font-size: 1.2rem; display: block; margin-bottom: 3px; }
+    .flow-btn.selected { background: var(--blush); border-color: var(--rose-deep); color: var(--plum); }
+
+    /* ---- SCROLLBAR ---- */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--mauve-light); border-radius: 4px; }
+
+    /* ---- GREETING ---- */
+    .greeting {
+      padding: 0 4px 4px;
+    }
+    .greeting-time { font-size: 0.78rem; color: var(--text-muted); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
+    .greeting-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.7rem; font-weight: 700; color: var(--plum); line-height: 1.15;
+    }
+    .greeting-name em { font-style: italic; color: var(--rose-deep); }
+
+    /* ---- CONFIDENCE CARD ---- */
+    .confidence-card {
+      background: linear-gradient(135deg, #f7d6e8, #ead4f0);
+      border-radius: 24px; padding: 22px;
+      position: relative; overflow: hidden;
+      border: 1px solid rgba(202,160,192,0.3);
+    }
+    .confidence-card::before {
+      content: '✦'; position: absolute; top: 12px; right: 16px;
+      font-size: 1.8rem; opacity: 0.2; color: var(--plum);
+    }
+    .confidence-label {
+      font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--plum-light); margin-bottom: 8px;
+    }
+    .confidence-quote {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem; font-weight: 500; font-style: italic;
+      color: var(--plum); line-height: 1.55; margin-bottom: 12px;
+    }
+    .confidence-sub {
+      font-size: 0.8rem; color: var(--plum-light); line-height: 1.5; font-weight: 600;
+    }
+    .confidence-nav {
+      display: flex; align-items: center; justify-content: space-between; margin-top: 14px;
+    }
+    .conf-dots { display: flex; gap: 5px; }
+    .conf-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--mauve); opacity: 0.4; transition: opacity 0.3s; }
+    .conf-dot.active { opacity: 1; background: var(--plum); }
+    .conf-next {
+      background: var(--plum); color: white; border: none; border-radius: 20px;
+      padding: 6px 14px; font-size: 0.75rem; font-weight: 700; cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+    }
+
+    /* ---- QUICK ACTIONS ---- */
+    .quick-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .quick-card {
+      border-radius: 20px; padding: 16px; cursor: pointer;
+      border: none; text-align: left; transition: transform 0.18s ease, box-shadow 0.18s ease;
+      font-family: 'Nunito', sans-serif;
+    }
+    .quick-card:active { transform: scale(0.96); }
+    .quick-card.rose { background: linear-gradient(135deg, var(--blush), #fbd4e2); }
+    .quick-card.mauve { background: linear-gradient(135deg, var(--mauve-light), #dcc8e8); }
+    .quick-card.gold { background: linear-gradient(135deg, #fef3d0, #fde8b0); }
+    .quick-card.mint { background: linear-gradient(135deg, #d8f0e8, #c4e8d8); }
+    .quick-card .qc-icon { font-size: 1.6rem; margin-bottom: 8px; display: block; }
+    .quick-card .qc-title { font-size: 0.82rem; font-weight: 700; color: var(--plum); display: block; }
+    .quick-card .qc-sub { font-size: 0.72rem; color: var(--text-muted); display: block; margin-top: 2px; }
+
+    /* ---- BETTER STATS ---- */
+    .stats-row { display: flex; gap: 10px; }
+    .stat-box {
+      flex: 1; background: var(--cream); border-radius: 18px; padding: 16px 10px; text-align: center;
+      border: 1px solid rgba(202,160,192,0.2);
+    }
+    .stat-num { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 700; color: var(--plum); line-height: 1; }
+    .stat-lbl { font-size: 0.68rem; color: var(--text-muted); margin-top: 4px; font-weight: 600; }
+
+    /* ---- PHASE TIMELINE ---- */
+    .phase-row { display: flex; gap: 8px; }
+    .phase-item {
+      flex: 1; border-radius: 16px; padding: 12px 8px; text-align: center;
+      background: var(--cream); transition: transform 0.2s ease;
+      border: 1px solid transparent;
+    }
+    .phase-item.current {
+      background: linear-gradient(135deg, var(--blush), var(--mauve-light));
+      border-color: rgba(202,160,192,0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(107,58,94,0.1);
+    }
+    .phase-item .p-icon { font-size: 1.3rem; margin-bottom: 4px; }
+    .phase-item .p-name { font-size: 0.68rem; font-weight: 700; color: var(--plum); }
+    .phase-item .p-days { font-size: 0.6rem; color: var(--text-muted); margin-top: 2px; }
+
+    /* ---- CALENDAR DAY POPUP ---- */
+    .cal-day-popup {
+      position: fixed; inset: 0; z-index: 300;
+      display: flex; align-items: flex-end; justify-content: center;
+      background: rgba(61,31,53,0.35); backdrop-filter: blur(4px);
+      animation: fadeIn 0.2s ease;
+    }
+    @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+    .cal-day-sheet {
+      background: var(--white); border-radius: 28px 28px 0 0;
+      width: 100%; max-width: 430px; padding: 24px 24px 40px;
+      animation: slideUp 0.3s ease;
+    }
+    @keyframes slideUp { from{transform:translateY(60px);opacity:0} to{transform:translateY(0);opacity:1} }
+    .cal-day-sheet h3 {
+      font-family: 'Playfair Display', serif; font-size: 1.2rem;
+      color: var(--plum); font-weight: 700; margin-bottom: 4px;
+    }
+    .cal-day-phase {
+      font-size: 0.8rem; color: var(--text-muted); font-weight: 600;
+      margin-bottom: 16px; display: flex; align-items: center; gap: 6px;
+    }
+    .cal-day-phase .phase-badge {
+      padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 700;
+    }
+    .phase-badge.period { background: var(--blush); color: #c45080; }
+    .phase-badge.follicular { background: #e8f5e8; color: #4a7a4a; }
+    .phase-badge.ovulation { background: var(--mauve-light); color: var(--plum); }
+    .phase-badge.luteal { background: #ece8f8; color: #6a4a9a; }
+    .phase-badge.fertile { background: #f0e8f8; color: var(--plum-light); }
+    .cal-day-info {
+      background: var(--cream); border-radius: 16px; padding: 14px;
+      font-size: 0.82rem; color: var(--text); line-height: 1.6; margin-bottom: 14px;
+    }
+    .cal-day-close {
+      width: 100%; padding: 14px; border: none; border-radius: 16px;
+      background: linear-gradient(135deg, var(--plum), var(--plum-light));
+      color: white; font-family: 'Nunito', sans-serif; font-size: 0.9rem;
+      font-weight: 700; cursor: pointer;
+    }
+
+    /* ---- ADVICE POPUP ---- */
+    .advice-popup {
+      position: fixed; inset: 0; z-index: 300;
+      display: flex; align-items: flex-end; justify-content: center;
+      background: rgba(61,31,53,0.3); backdrop-filter: blur(3px);
+      animation: fadeIn 0.2s ease;
+    }
+    .advice-sheet {
+      background: var(--white); border-radius: 28px 28px 0 0;
+      width: 100%; max-width: 430px; padding: 24px 24px 44px;
+      animation: slideUp 0.3s ease;
+    }
+    .advice-sheet .advice-icon { font-size: 2.2rem; margin-bottom: 8px; display: block; text-align: center; }
+    .advice-sheet h3 {
+      font-family: 'Playfair Display', serif; font-size: 1.15rem;
+      color: var(--plum); font-weight: 700; margin-bottom: 14px; text-align: center;
+    }
+    .advice-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
+    .advice-item {
+      display: flex; gap: 10px; align-items: flex-start;
+      background: var(--cream); border-radius: 14px; padding: 12px;
+    }
+    .advice-item .a-icon { font-size: 1.2rem; flex-shrink: 0; }
+    .advice-item .a-text { font-size: 0.82rem; color: var(--text); line-height: 1.5; }
+    .advice-close {
+      width: 100%; padding: 14px; border: none; border-radius: 16px;
+      background: linear-gradient(135deg, var(--plum), var(--plum-light));
+      color: white; font-family: 'Nunito', sans-serif; font-size: 0.9rem;
+      font-weight: 700; cursor: pointer;
+    }
+    .subtle-actions {
+      display: flex; align-items: center;
+      background: var(--white); border-radius: 18px;
+      padding: 4px 6px; box-shadow: var(--shadow-sm);
+      gap: 0;
+    }
+    .subtle-btn {
+      flex: 1; display: flex; align-items: center; justify-content: center;
+      gap: 6px; padding: 11px 8px; background: none; border: none;
+      cursor: pointer; font-family: 'Nunito', sans-serif;
+      font-size: 0.78rem; font-weight: 600; color: var(--text-muted);
+      border-radius: 14px; transition: all 0.2s;
+    }
+    .subtle-btn:active { background: var(--cream); transform: scale(0.97); }
+    .subtle-btn.period-btn { color: #c45080; }
+    .subtle-btn.test-btn { color: var(--plum-light); }
+    .subtle-divider { width: 1px; height: 24px; background: var(--mauve-light); flex-shrink: 0; }
+
+    /* ---- MINI TEST PANEL ---- */
+    .mini-test-panel {
+      background: var(--white); border-radius: 22px;
+      padding: 18px; box-shadow: var(--shadow);
+      border: 1px solid var(--mauve-light);
+      animation: fadeUp 0.25s ease;
+    }
+    .mini-test-header {
+      display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;
+    }
+    .ovul-test-card {
+      background: linear-gradient(135deg, #f0e6f8, #e8d4f0);
+      border-radius: 24px; padding: 20px;
+      border: 1px solid rgba(160,100,180,0.2);
+    }
+    .ovul-test-card .card-title { margin-bottom: 10px; }
+    .ovul-result-row { display: flex; gap: 10px; margin: 14px 0; }
+    .ovul-result-btn {
+      flex: 1; border: 2px solid var(--mauve-light); border-radius: 16px; padding: 14px 8px;
+      background: white; cursor: pointer; text-align: center; transition: all 0.2s;
+      font-family: 'Nunito', sans-serif;
+    }
+    .ovul-result-btn .or-icon { font-size: 1.5rem; display: block; margin-bottom: 5px; }
+    .ovul-result-btn .or-label { font-size: 0.78rem; font-weight: 700; color: var(--plum); display: block; }
+    .ovul-result-btn .or-sub { font-size: 0.68rem; color: var(--text-muted); display: block; margin-top: 2px; }
+    .ovul-result-btn.positive { background: linear-gradient(135deg,#fce8ef,#f5d0e8); border-color: var(--rose-deep); }
+    .ovul-result-btn.negative { background: linear-gradient(135deg,#eef0f8,#e0e4f0); border-color: #a0a8c8; }
+    .ovul-result-btn.selected { box-shadow: 0 4px 14px rgba(107,58,94,0.2); transform: translateY(-2px); }
+    .ovul-date-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+    .ovul-date-row label { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; white-space: nowrap; }
+    .ovul-date-input {
+      flex: 1; border: 1.5px solid var(--mauve-light); border-radius: 12px;
+      padding: 9px 12px; font-family: 'Nunito', sans-serif; font-size: 0.85rem;
+      background: white; color: var(--text); outline: none;
+    }
+    .ovul-confirm-btn {
+      background: linear-gradient(135deg, var(--plum), var(--plum-light));
+      color: white; border: none; border-radius: 14px; padding: 11px 18px;
+      font-family: 'Nunito', sans-serif; font-size: 0.82rem; font-weight: 700; cursor: pointer;
+      white-space: nowrap;
+    }
+    .ovul-time-toggle {
+      background: none; border: 1.5px dashed var(--mauve); border-radius: 12px;
+      padding: 8px 14px; font-family: 'Nunito', sans-serif; font-size: 0.78rem;
+      font-weight: 600; color: var(--plum-light); cursor: pointer; width: 100%;
+      transition: all 0.2s;
+    }
+    .ovul-time-toggle.active { background: var(--mauve-light); border-style: solid; color: var(--plum); }
+    .ovul-history-item {
+      display: flex; align-items: center; justify-content: space-between;
+      background: white; border-radius: 12px; padding: 10px 12px; margin-bottom: 6px;
+      font-size: 0.8rem;
+    }
+    .ovul-history-item .hi-result { font-size: 1rem; margin-right: 8px; }
+    .ovul-history-item .hi-date { color: var(--plum); font-weight: 600; }
+    .ovul-history-item .hi-time { color: var(--text-muted); font-size: 0.72rem; }
+    .ovul-history-item .hi-del { background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 0.9rem; padding: 2px 6px; }
+    .toast {
+      position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(20px);
+      background: var(--plum); color: white; padding: 10px 22px; border-radius: 20px;
+      font-size: 0.82rem; opacity: 0; transition: all 0.3s ease; z-index: 200; white-space: nowrap;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+
+<!-- BACKGROUND -->
+<div class="bg-orbs">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- ONBOARDING -->
+<div id="onboarding">
+  <div class="ob-logo"><em>MyFlower</em></div>
+  <p class="ob-tagline">Ton cycle, ta vie, en harmonie 🌸</p>
+  <div class="ob-card">
+    <h3>Bienvenue 🌸</h3>
+    <div class="ob-field">
+      <label>Ton prénom</label>
+      <input type="text" id="ob-name" placeholder="Marie" />
+    </div>
+    <div class="ob-field">
+      <label>Date de tes dernières règles</label>
+      <input type="date" id="ob-last" />
+    </div>
+    <div class="ob-field">
+      <label>Durée habituelle de ton cycle (jours)</label>
+      <input type="number" id="ob-cycle" value="28" min="21" max="45" />
+    </div>
+    <div class="ob-field">
+      <label>Durée de tes règles (jours)</label>
+      <input type="number" id="ob-period" value="5" min="2" max="10" />
+    </div>
+    <div class="ob-field">
+      <label>Contraception</label>
+      <select id="ob-contra">
+        <option value="none">Aucune</option>
+        <option value="pill">Pilule combinée</option>
+        <option value="minipill">Minipilule</option>
+        <option value="iud">Stérilet (DIU)</option>
+        <option value="implant">Implant</option>
+        <option value="condom">Préservatif</option>
+        <option value="patch">Patch</option>
+        <option value="ring">Anneau vaginal</option>
+      </select>
+    </div>
+    <div class="ob-field">
+      <label>Tu cherches à concevoir ?</label>
+      <div class="ob-conception-row">
+        <button class="ob-conception-btn" id="ob-conceive-yes" onclick="selectConception(true)">
+          👶 Oui, j'essaie
+        </button>
+        <button class="ob-conception-btn" id="ob-conceive-no" onclick="selectConception(false)">
+          🚫 Non, pas pour l'instant
+        </button>
+      </div>
+    </div>
+  </div>
+  <button class="ob-btn" onclick="startApp()">Commencer mon suivi 🌙</button>
+</div>
+
+<!-- APP -->
+<div class="app" id="app" style="display:none">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="logo"><em>MyFlower</em></div>
+    <button class="profile-btn" onclick="showToast('Profil bientôt disponible 🌸')">👤</button>
+  </div>
+
+  <!-- NAV -->
+  <div class="nav">
+    <button class="nav-btn active" onclick="showScreen('home',this)"><span class="icon">🌙</span>Accueil</button>
+    <button class="nav-btn" onclick="showScreen('calendar',this)"><span class="icon">📅</span>Calendrier</button>
+    <button class="nav-btn" onclick="showScreen('body',this)"><span class="icon">💫</span>Mon corps</button>
+    <button class="nav-btn" onclick="showScreen('luna-ai',this)"><span class="icon">✨</span>Luna IA</button>
+  </div>
+
+  <!-- ===== HOME ===== -->
+  <div class="screen active" id="screen-home">
+
+    <!-- GREETING -->
+    <div class="greeting">
+      <div class="greeting-time" id="greeting-time">Bonjour</div>
+      <div class="greeting-name">Belle journée,<br><em id="greeting-name">mon amie</em> 🌸</div>
+    </div>
+
+    <!-- CYCLE HERO -->
+    <div class="cycle-hero" id="cycle-hero">
+      <div class="petal1"></div>
+      <div class="petal2"></div>
+      <div class="cycle-label">Phase actuelle</div>
+      <div class="cycle-phase" id="phase-name">Folliculaire</div>
+      <div class="cycle-sub" id="phase-sub">Ton énergie remonte doucement 🌱</div>
+      <div class="cycle-ring-wrap">
+        <div class="ring-container">
+          <svg class="ring" width="140" height="140" viewBox="0 0 140 140">
+            <circle class="ring-bg" cx="70" cy="70" r="55"/>
+            <circle class="ring-fill" id="ring-fill" cx="70" cy="70" r="55"/>
+          </svg>
+          <div class="ring-center">
+            <div class="ring-day" id="ring-day">8</div>
+            <div class="ring-total" id="ring-total">sur 28 jours</div>
+          </div>
+        </div>
+      </div>
+      <div class="cycle-tags" id="cycle-tags">
+        <span class="cycle-tag" id="tag-next">🩸 Règles dans 18j</span>
+        <span class="cycle-tag" id="tag-ovul">🥚 Ovulation dans 6j</span>
+      </div>
+    </div>
+
+    <!-- ACTIONS DISCRÈTES : règles + test ovulation -->
+    <div class="subtle-actions">
+      <button class="subtle-btn period-btn" onclick="togglePeriod()">
+        <span>🩸</span> <span id="subtle-period-text">Mes règles ont commencé</span>
+      </button>
+      <div class="subtle-divider"></div>
+      <button class="subtle-btn test-btn" onclick="openQuickTest()">
+        <span>🧪</span> <span>J'ai fait un test d'ovulation</span>
+      </button>
+    </div>
+
+    <!-- MINI TEST D'OVULATION (popup depuis accueil) -->
+    <div class="mini-test-panel" id="mini-test-panel" style="display:none">
+      <div class="mini-test-header">
+        <span style="font-family:'Playfair Display',serif;font-weight:700;color:var(--plum);">🧪 Test d'ovulation</span>
+        <button onclick="closeMiniTest()" style="background:none;border:none;font-size:1.2rem;color:var(--text-muted);cursor:pointer;">✕</button>
+      </div>
+      <div class="ovul-result-row" style="margin:10px 0;">
+        <button class="ovul-result-btn" id="mt-pos" onclick="selectMiniResult('positive')">
+          <span class="or-icon">✅</span><span class="or-label">Positif</span>
+        </button>
+        <button class="ovul-result-btn" id="mt-neg" onclick="selectMiniResult('negative')">
+          <span class="or-icon">❌</span><span class="or-label">Négatif</span>
+        </button>
+      </div>
+      <div class="ovul-date-row" style="margin-bottom:8px;">
+        <label>Date</label>
+        <input type="date" class="ovul-date-input" id="mt-date" style="flex:1" />
+      </div>
+      <button class="ovul-time-toggle" id="mt-time-toggle" onclick="toggleMiniTime()" style="margin-bottom:8px;">⏰ Ajouter l'heure (optionnel)</button>
+      <div id="mt-time-wrap" style="display:none;margin-bottom:8px;">
+        <div class="ovul-date-row">
+          <label>Heure</label>
+          <input type="time" class="ovul-date-input" id="mt-time" />
+        </div>
+      </div>
+      <button class="ovul-confirm-btn" style="width:100%" onclick="submitMiniTest()">Enregistrer</button>
+      <div class="ovul-status" id="mt-status" style="margin-top:8px;"></div>
+    </div>
+
+    <!-- MESSAGE DU JOUR (toujours visible, change selon la phase) -->
+    <div class="confidence-card" id="confidence-card">
+      <div class="confidence-label"><span id="conf-icon">🌸</span> <span id="conf-label">Message du jour</span></div>
+      <div class="confidence-quote" id="conf-quote">"Tu mérites d'être heureuse."</div>
+      <div class="confidence-sub" id="conf-sub">Commence cette journée avec douceur envers toi-même.</div>
+    </div>
+
+    <!-- TIP BANNER -->
+    <div class="tip-banner" id="phase-tip">
+      <div class="tip-icon">💡</div>
+      <div class="tip-text">
+        <div class="tip-title" id="tip-title">Phase folliculaire</div>
+        <div id="tip-body">C'est le bon moment pour commencer de nouveaux projets et faire du sport intensif. Ton énergie et ta créativité sont en hausse !</div>
+      </div>
+    </div>
+
+    <!-- QUICK ACTIONS -->
+    <div class="quick-actions">
+      <button class="quick-card rose" onclick="togglePeriod()">
+        <span class="qc-icon">🩸</span>
+        <span class="qc-title" id="log-btn-text">Début des règles</span>
+        <span class="qc-sub">Enregistrer aujourd'hui</span>
+      </button>
+      <button class="quick-card mauve" onclick="showScreen('body', document.querySelectorAll('.nav-btn')[2])">
+        <span class="qc-icon">💫</span>
+        <span class="qc-title">Mon corps</span>
+        <span class="qc-sub">Humeur & symptômes</span>
+      </button>
+      <button class="quick-card gold" onclick="showScreen('luna-ai', document.querySelectorAll('.nav-btn')[3])">
+        <span class="qc-icon">✨</span>
+        <span class="qc-title">MyFlower IA</span>
+        <span class="qc-sub">Poser une question</span>
+      </button>
+      <button class="quick-card mint" onclick="showScreen('calendar', document.querySelectorAll('.nav-btn')[1])">
+        <span class="qc-icon">📅</span>
+        <span class="qc-title">Calendrier</span>
+        <span class="qc-sub">Voir mes prédictions</span>
+      </button>
+    </div>
+
+    <!-- STATS -->
+    <div class="card">
+      <div class="card-title">📊 Mon cycle en chiffres</div>
+      <div class="stats-row">
+        <div class="stat-box">
+          <div class="stat-num" id="stat-cycle">28</div>
+          <div class="stat-lbl">Jours / cycle</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" id="stat-period">5</div>
+          <div class="stat-lbl">Jours de règles</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" id="stat-day">J8</div>
+          <div class="stat-lbl">Aujourd'hui</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PHASE TIMELINE -->
+    <div class="card">
+      <div class="card-title">🔄 Phases du cycle</div>
+      <div class="phase-row" id="phase-row">
+        <div class="phase-item" id="ph-period">
+          <div class="p-icon">🩸</div>
+          <div class="p-name">Règles</div>
+          <div class="p-days" id="ph-period-days">J1–J5</div>
+        </div>
+        <div class="phase-item" id="ph-follic">
+          <div class="p-icon">🌱</div>
+          <div class="p-name">Folliculaire</div>
+          <div class="p-days" id="ph-follic-days">J6–J12</div>
+        </div>
+        <div class="phase-item" id="ph-ovul">
+          <div class="p-icon">🥚</div>
+          <div class="p-name">Ovulation</div>
+          <div class="p-days" id="ph-ovul-days">J13–J15</div>
+        </div>
+        <div class="phase-item" id="ph-luteal">
+          <div class="p-icon">🌙</div>
+          <div class="p-name">Lutéale</div>
+          <div class="p-days" id="ph-luteal-days">J16–J28</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===== CALENDAR ===== -->
+  <div class="screen" id="screen-calendar">
+    <div class="card">
+      <div class="cal-header">
+        <button class="cal-nav" onclick="prevMonth()">‹</button>
+        <div class="cal-month" id="cal-month-label">Mai 2026</div>
+        <button class="cal-nav" onclick="nextMonth()">›</button>
+      </div>
+      <div class="cal-grid" id="cal-grid"></div>
+      <div class="cal-legend">
+        <div class="leg-item"><div class="leg-dot" style="background:linear-gradient(135deg,#f2a7bb,#e07094)"></div>Règles</div>
+        <div class="leg-item"><div class="leg-dot" style="background:linear-gradient(135deg,#c9a0c0,#9a5a8a)"></div>Ovulation</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#e8d4e5"></div>Fertile</div>
+        <div class="leg-item"><div class="leg-dot" style="border:1.5px dashed #e07094;background:none"></div>Prédit</div>
+      </div>
+    </div>
+
+    <!-- CONTRACEPTION -->
+    <div class="card">
+      <div class="card-title">💊 Ma contraception</div>
+      <div class="contra-grid" id="contra-grid">
+        <div class="contra-btn" onclick="selectContra(this,'pill')"><div class="c-icon">💊</div><div class="c-name">Pilule combinée</div></div>
+        <div class="contra-btn" onclick="selectContra(this,'minipill')"><div class="c-icon">🔵</div><div class="c-name">Minipilule</div></div>
+        <div class="contra-btn" onclick="selectContra(this,'iud')"><div class="c-icon">🔷</div><div class="c-name">Stérilet (DIU)</div></div>
+        <div class="contra-btn" onclick="selectContra(this,'implant')"><div class="c-icon">📍</div><div class="c-name">Implant</div></div>
+        <div class="contra-btn" onclick="selectContra(this,'condom')"><div class="c-icon">🛡️</div><div class="c-name">Préservatif</div></div>
+        <div class="contra-btn" onclick="selectContra(this,'none')"><div class="c-icon">🌿</div><div class="c-name">Aucune</div></div>
+      </div>
+    </div>
+
+    <!-- PILL REMINDER -->
+    <div class="pill-reminder" id="pill-reminder" style="display:none">
+      <div class="pill-icon">💊</div>
+      <div class="pill-text">
+        <h4>Rappel pilule</h4>
+        <p id="pill-status">N'oublie pas ta pilule aujourd'hui !</p>
+      </div>
+      <button class="pill-check" onclick="takePill()" id="pill-btn">✅</button>
+    </div>
+
+    <!-- OVULATION TEST -->
+    <div class="ovul-test-card">
+      <div class="card-title">🧪 Tests d'ovulation</div>
+      <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:14px;">Plus tu enregistres de tests, plus l'estimation de ton ovulation sera précise.</p>
+
+      <!-- Nouveau test -->
+      <div class="ovul-result-row">
+        <button class="ovul-result-btn" id="ovul-pos" onclick="selectOvulResult('positive')">
+          <span class="or-icon">✅</span>
+          <span class="or-label">Positif</span>
+          <span class="or-sub">LH détectée</span>
+        </button>
+        <button class="ovul-result-btn" id="ovul-neg" onclick="selectOvulResult('negative')">
+          <span class="or-icon">❌</span>
+          <span class="or-label">Négatif</span>
+          <span class="or-sub">Pas encore</span>
+        </button>
+      </div>
+
+      <div class="ovul-date-row" style="margin-top:12px;">
+        <label>Date</label>
+        <input type="date" class="ovul-date-input" id="ovul-date" style="flex:1.4" />
+      </div>
+
+      <!-- Heure optionnelle -->
+      <div style="margin-top:8px;">
+        <button class="ovul-time-toggle" id="ovul-time-toggle" onclick="toggleTimeInput()">
+          ⏰ Ajouter l'heure (optionnel)
+        </button>
+        <div id="ovul-time-wrap" style="display:none;margin-top:8px;">
+          <div class="ovul-date-row">
+            <label>Heure</label>
+            <input type="time" class="ovul-date-input" id="ovul-time" />
+          </div>
+          <p style="font-size:0.72rem;color:var(--text-muted);margin-top:5px;">L'heure permet une estimation plus précise si tu fais tes tests chaque jour à la même heure.</p>
+        </div>
+      </div>
+
+      <button class="ovul-confirm-btn" style="width:100%;margin-top:14px;" onclick="addOvulTest()">Enregistrer ce test</button>
+
+      <!-- Historique des tests -->
+      <div id="ovul-history" style="margin-top:14px;display:none;">
+        <div style="font-size:0.78rem;font-weight:700;color:var(--plum);margin-bottom:8px;">📋 Tests enregistrés</div>
+        <div id="ovul-history-list"></div>
+      </div>
+
+      <!-- Résultat estimation -->
+      <div class="ovul-status" id="ovul-status"></div>
+    </div>
+
+  </div>
+
+  <!-- ===== BODY ===== -->
+  <div class="screen" id="screen-body">
+
+    <!-- FLOW -->
+    <div class="card">
+      <div class="card-title">🩸 Flux menstruel</div>
+      <div class="flow-row">
+        <button class="flow-btn" onclick="selectFlow(this,'none')"><span class="f-drop">⚪</span>Aucun</button>
+        <button class="flow-btn" onclick="selectFlow(this,'light')"><span class="f-drop">🩷</span>Léger</button>
+        <button class="flow-btn" onclick="selectFlow(this,'medium')"><span class="f-drop">🩸</span>Moyen</button>
+        <button class="flow-btn" onclick="selectFlow(this,'heavy')"><span class="f-drop">🔴</span>Abondant</button>
+      </div>
+    </div>
+
+    <!-- MOOD -->
+    <div class="card">
+      <div class="card-title">😊 Mon humeur du jour</div>
+      <div class="mood-row" id="mood-row">
+        <button class="mood-btn" onclick="selectMood(this,'happy')">😄<span class="mood-label">Joyeuse</span></button>
+        <button class="mood-btn" onclick="selectMood(this,'calm')">😌<span class="mood-label">Calme</span></button>
+        <button class="mood-btn" onclick="selectMood(this,'sad')">😢<span class="mood-label">Triste</span></button>
+        <button class="mood-btn" onclick="selectMood(this,'anxious')">😰<span class="mood-label">Anxieuse</span></button>
+        <button class="mood-btn" onclick="selectMood(this,'irritable')">😤<span class="mood-label">Irritable</span></button>
+      </div>
+    </div>
+
+    <!-- SYMPTOMS -->
+    <div class="card">
+      <div class="card-title">🌡️ Symptômes du jour</div>
+      <div class="symptom-grid">
+        <button class="symptom-btn" data-symptom="Crampes" onclick="toggleSymptom(this)"><div class="s-icon">🤕</div><span class="s-label">Crampes</span></button>
+        <button class="symptom-btn" data-symptom="Maux de tête" onclick="toggleSymptom(this)"><div class="s-icon">🧠</div><span class="s-label">Maux de tête</span></button>
+        <button class="symptom-btn" data-symptom="Fatigue" onclick="toggleSymptom(this)"><div class="s-icon">😴</div><span class="s-label">Fatigue</span></button>
+        <button class="symptom-btn" data-symptom="Nausée" onclick="toggleSymptom(this)"><div class="s-icon">🤢</div><span class="s-label">Nausée</span></button>
+        <button class="symptom-btn" data-symptom="Ballonnements" onclick="toggleSymptom(this)"><div class="s-icon">💧</div><span class="s-label">Ballonnements</span></button>
+        <button class="symptom-btn" data-symptom="Envies" onclick="toggleSymptom(this)"><div class="s-icon">🍫</div><span class="s-label">Envies</span></button>
+        <button class="symptom-btn" data-symptom="Sensibilité seins" onclick="toggleSymptom(this)"><div class="s-icon">🌡️</div><span class="s-label">Sensibilité seins</span></button>
+        <button class="symptom-btn" data-symptom="Insomnie" onclick="toggleSymptom(this)"><div class="s-icon">💤</div><span class="s-label">Insomnie</span></button>
+        <button class="symptom-btn" data-symptom="Bouffées" onclick="toggleSymptom(this)"><div class="s-icon">🔥</div><span class="s-label">Bouffées</span></button>
+      </div>
+      <button class="btn-primary" style="margin-top:14px" onclick="saveSymptoms()">Enregistrer & voir les conseils 💡</button>
+    </div>
+
+  </div>
+
+  <!-- ===== LUNA IA ===== -->
+  <div class="screen" id="screen-luna-ai">
+    <div class="card">
+      <div class="section-title">Luna IA ✨</div>
+      <div class="section-sub">Pose-moi toutes tes questions sur ton cycle, ta santé et ton bien-être</div>
+      <div class="chat-area" id="chat-area">
+        <div class="msg luna">
+          <div class="msg-name">🌙 Luna</div>
+          Bonjour ! Je suis Luna, ton assistante santé féminine. Je suis là pour répondre à tes questions sur ton cycle, ta contraception, et comment adapter ta vie à chaque phase. Que voudrais-tu savoir ? 💕
+        </div>
+      </div>
+      <div class="chat-input-row">
+        <input class="chat-input" id="chat-input" type="text" placeholder="Pose ta question à Luna..." onkeydown="if(event.key==='Enter')sendMsg()" />
+        <button class="send-btn" onclick="sendMsg()">➤</button>
+      </div>
+    </div>
+
+    <!-- QUICK QUESTIONS -->
+    <div class="card">
+      <div class="card-title">💬 Questions fréquentes</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <button class="btn-outline" onclick="quickAsk('Quels sports sont recommandés pendant mes règles ?')">🏃‍♀️ Sport pendant les règles</button>
+        <button class="btn-outline" onclick="quickAsk('Comment gérer les crampes naturellement ?')">🌿 Gérer les crampes</button>
+        <button class="btn-outline" onclick="quickAsk('Comment la pilule affecte-t-elle mon cycle ?')">💊 Pilule et cycle</button>
+        <button class="btn-outline" onclick="quickAsk('Quels aliments manger selon ma phase ?')">🥗 Alimentation et cycle</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /app -->
+
+<script>
+// ========== STATE ==========
+let userData = {
+  name: 'Utilisatrice',
+  cycles: [],        // [{start: 'YYYY-MM-DD', length: 5}] — liste de tous les cycles enregistrés
+  cycleLength: 28,   // durée habituelle du cycle
+  periodLength: 5,   // durée habituelle des règles (défaut)
+  contraception: 'none',
+  pillTaken: false,
+  symptoms: [],
+  flow: null,
+  mood: null,
+  customOvDay: null,
+  wantsToConceive: null,
+};
+
+// Helpers
+function getLastCycle() {
+  if (!userData.cycles.length) return null;
+  return userData.cycles[userData.cycles.length - 1];
+}
+function getLastPeriodDate() {
+  const lc = getLastCycle();
+  if (!lc) return null;
+  return new Date(lc.start + 'T12:00');
+}
+function getLastPeriodLength() {
+  const lc = getLastCycle();
+  return lc ? lc.length : userData.periodLength;
+}
+function toDateStr(date) {
+  const d = new Date(date); d.setHours(0,0,0,0);
+  return d.toISOString().split('T')[0];
+}
+
+let calViewYear = new Date().getFullYear();
+let calViewMonth = new Date().getMonth();
+let chatHistory = [];
+
+// ========== LOCALSTORAGE ==========
+function saveData() {
+  try {
+    localStorage.setItem('myflower_userData', JSON.stringify(userData));
+    localStorage.setItem('myflower_ovulTests', JSON.stringify(ovulTests));
+  } catch(e) { console.warn('Save failed', e); }
+}
+
+function loadData() {
+  try {
+    const savedUser = localStorage.getItem('myflower_userData');
+    const savedTests = localStorage.getItem('myflower_ovulTests');
+    if (savedUser) Object.assign(userData, JSON.parse(savedUser));
+    if (savedTests) ovulTests = JSON.parse(savedTests);
+  } catch(e) { console.warn('Load failed', e); }
+}
+
+// ========== ONBOARDING ==========
+function selectConception(val) {
+  userData.wantsToConceive = val;
+  document.getElementById('ob-conceive-yes').classList.toggle('selected', val === true);
+  document.getElementById('ob-conceive-no').classList.toggle('selected', val === false);
+}
+
+function startApp() {
+  const name = document.getElementById('ob-name').value.trim() || 'Toi';
+  const last = document.getElementById('ob-last').value;
+  const cycle = parseInt(document.getElementById('ob-cycle').value) || 28;
+  const period = parseInt(document.getElementById('ob-period').value) || 5;
+  const contra = document.getElementById('ob-contra').value;
+
+  if (!last) { showToast('Indique la date de tes dernières règles 📅'); return; }
+
+  userData.name = name;
+  userData.cycleLength = cycle;
+  userData.periodLength = period;
+  userData.contraception = contra;
+  // Add first cycle
+  userData.cycles = [{ start: last, length: period }];
+
+  document.getElementById('onboarding').classList.add('hidden');
+  document.getElementById('app').style.display = 'flex';
+  setTimeout(() => document.getElementById('onboarding').style.display = 'none', 500);
+
+  updateAll();
+  renderCalendar();
+  updateContraUI();
+  initChat();
+  updateGreeting(userData.name);
+  saveData();
+}
+
+// ========== CONFIDENCE MESSAGES ==========
+// ========== DAILY MESSAGES ==========
+// Un message par jour, différent selon la phase, jamais les mêmes
+// Clé: phase + numéro du jour dans la phase pour varier selon les cycles
+
+const dailyMessages = {
+
+  // 🩸 RÈGLES — encouragement douleur + place de la femme (14 messages, ~2 cycles)
+  period: [
+    {
+      icon: '🌹',
+      label: 'Pour toi, aujourd\'hui',
+      quote: 'Ton corps fait quelque chose d\'extraordinaire ce mois-ci encore.',
+      sub: 'Ce que tu traverses demande du courage. Tu es plus forte que tu ne le crois.'
+    },
+    {
+      icon: '💫',
+      label: 'Tu comptes',
+      quote: 'Les femmes portent le monde avec une grâce que peu reconnaissent à sa juste valeur.',
+      sub: 'Ce que tu vis chaque mois est une forme de puissance silencieuse. Honore-toi.'
+    },
+    {
+      icon: '🌸',
+      label: 'Douceur pour toi',
+      quote: 'La douleur d\'aujourd\'hui ne définit pas qui tu es — elle montre à quel point tu es vivante.',
+      sub: 'Repose-toi sans culpabilité. Ton corps mérite toute ta tendresse.'
+    },
+    {
+      icon: '✨',
+      label: 'Tu es essentielle',
+      quote: 'Les femmes ont bâti des empires, élevé des générations, changé des histoires — souvent dans la douleur et le silence.',
+      sub: 'Tu fais partie de cette lignée extraordinaire. Ne l\'oublie jamais.'
+    },
+    {
+      icon: '🕯️',
+      label: 'Rien que pour toi',
+      quote: 'Prendre soin de soi n\'est pas un luxe — c\'est un acte révolutionnaire.',
+      sub: 'Aujourd\'hui, autorise-toi à tout ralentir. Tu le mérites pleinement.'
+    },
+    {
+      icon: '🌙',
+      label: 'Ta force',
+      quote: 'Ce cycle que ton corps traverse chaque mois est un miracle que la science admire.',
+      sub: 'Tu n\'es pas faible parce que tu souffres — tu es humaine, et ça, c\'est beau.'
+    },
+    {
+      icon: '💗',
+      label: 'Message du cœur',
+      quote: 'Les femmes ont appris à sourire malgré tout. Mais aujourd\'hui, tu n\'as pas à sourire si tu n\'en as pas envie.',
+      sub: 'Sois vraie avec toi-même. C\'est ça, la vraie force.'
+    },
+    {
+      icon: '🌺',
+      label: 'Pour ta journée',
+      quote: 'Chaque femme qui prend soin d\'elle inspire celles qui l\'entourent à faire de même.',
+      sub: 'En t\'accordant du repos aujourd\'hui, tu te bats pour quelque chose de plus grand.'
+    },
+    {
+      icon: '🦋',
+      label: 'Tu n\'es pas seule',
+      quote: 'Des millions de femmes traversent la même chose que toi, exactement maintenant.',
+      sub: 'Il y a une solidarité silencieuse entre vous. Elles te tiennent, tu les tiens.'
+    },
+    {
+      icon: '🌿',
+      label: 'Rappel important',
+      quote: 'Demander de l\'aide, accepter le repos, dire "je souffre" — ce n\'est pas de la faiblesse.',
+      sub: 'C\'est de la sagesse. Et tu en as plus qu\'assez.'
+    },
+    {
+      icon: '💎',
+      label: 'Ta valeur',
+      quote: 'Tu vaux bien plus que ta productivité et bien plus que ta douleur.',
+      sub: 'Aujourd\'hui, sois gentille avec toi-même. Tu mérites la même douceur que tu donnes aux autres.'
+    },
+    {
+      icon: '🌟',
+      label: 'Pour toi seule',
+      quote: 'L\'histoire des femmes est une histoire de résilience que personne n\'a vraiment récompensée.',
+      sub: 'Toi, tu te récompenses aujourd\'hui : chaleur, repos, et toute la douceur possible.'
+    },
+    {
+      icon: '🎀',
+      label: 'Un souffle',
+      quote: 'Ton corps sait exactement ce qu\'il fait. Fais-lui confiance.',
+      sub: 'Respire. Apaise. Ce moment aussi va passer, et tu seras encore là, plus forte.'
+    },
+    {
+      icon: '🌈',
+      label: 'Courage',
+      quote: 'Traverser la douleur avec grâce — même si c\'est en pyjama sous une couverture — c\'est de l\'héroïsme ordinaire.',
+      sub: 'Et toi, tu en es capable chaque mois. C\'est immense.'
+    },
+  ],
+
+  // 🌱 FOLLICULAIRE — messages gentils et courts
+  follicular: [
+    { icon: '🌱', label: 'Bonjour toi', quote: 'Tu reprends des couleurs.', sub: 'Et c\'est beau à voir.' },
+    { icon: '☀️', label: 'Ce matin', quote: 'Quelque chose de doux t\'attend aujourd\'hui.', sub: 'Laisse-toi surprendre.' },
+    { icon: '🌸', label: 'Juste ça', quote: 'Tu mérites une belle journée.', sub: 'Et c\'est parti pour être l\'une d\'elles.' },
+    { icon: '✨', label: 'Un petit mot', quote: 'Ton énergie revient — profites-en.', sub: 'Tu rayonnes déjà.' },
+    { icon: '💐', label: 'Pour toi', quote: 'Tu es en train de fleurir.', sub: 'Doucement, mais sûrement.' },
+    { icon: '🦋', label: 'Aujourd\'hui', quote: 'C\'est un bon jour pour toi.', sub: 'Vraiment.' },
+    { icon: '🎀', label: 'Rappel doux', quote: 'Tu es charmante, même quand tu l\'oublies.', sub: 'Surtout quand tu l\'oublies.' },
+    { icon: '🌿', label: 'Ce soir', quote: 'Tu as bien fait aujourd\'hui.', sub: 'Quel que soit ce que tu as fait.' },
+    { icon: '💫', label: 'Joli moment', quote: 'Quelqu\'un pense à toi en ce moment.', sub: 'Et cette pensée est douce.' },
+    { icon: '🌙', label: 'Simple', quote: 'Tu es apaisante à avoir autour.', sub: 'Ça, ça compte.' },
+  ],
+
+  // 🥚 PRÉ-OVULATION & OVULATION — confiance en soi, compliments de la moitié (7 messages)
+  preovulation: [
+    {
+      icon: '💕',
+      label: 'De la part de celui qui t\'aime',
+      quote: '"Tu es la plus belle chose qui me soit arrivée."',
+      sub: 'Ces mots viennent du cœur de quelqu\'un qui te voit vraiment. Laisse-les entrer — tu les mérites.'
+    },
+    {
+      icon: '🌹',
+      label: 'Ce qu\'il voit en toi',
+      quote: '"Quand tu entres dans une pièce, tout change pour moi."',
+      sub: 'Quelqu\'un t\'admire avec sincérité. Apprends à recevoir cet amour sans le minimiser.'
+    },
+    {
+      icon: '✨',
+      label: 'Les mots qu\'il garde en lui',
+      quote: '"Tu n\'as aucune idée à quel point tu es magnifique."',
+      sub: 'La prochaine fois qu\'on te complimente, dis simplement : "Merci, ça me touche." C\'est tout ce qu\'il faut.'
+    },
+    {
+      icon: '💫',
+      label: 'Ce qu\'il n\'ose pas toujours dire',
+      quote: '"Je suis fier d\'être à tes côtés."',
+      sub: 'Recevoir l\'amour de quelqu\'un est un acte de courage. Tu en es capable.'
+    },
+    {
+      icon: '🌸',
+      label: 'Son regard sur toi',
+      quote: '"Tu es belle quand tu ris — mais aussi quand tu doutes."',
+      sub: 'Tu n\'as pas besoin d\'être parfaite pour être aimée. Tu l\'es, entière.'
+    },
+    {
+      icon: '💗',
+      label: 'Pour que tu le saches',
+      quote: '"Je t\'ai choisie, et je te choisis encore chaque jour."',
+      sub: 'Les compliments de ceux qu\'on aime méritent d\'être reçus avec douceur, pas balayés. Essaie.'
+    },
+    {
+      icon: '🔥',
+      label: 'Il le pense vraiment',
+      quote: '"Tu es la personne la plus belle et la plus forte que je connaisse."',
+      sub: 'Croire en l\'amour qu\'on te porte, c\'est aussi t\'aimer toi-même. Un pas à la fois.'
+    },
+  ],
+
+  // 🌙 LUTÉALE — messages doux et encourageants pour la phase PMS
+  luteal: [
+    {
+      icon: '🌙',
+      label: 'Rappel doux',
+      quote: 'Ce que tu ressens est réel — et temporaire.',
+      sub: 'Ton corps traverse une phase normale. Sois douce avec toi-même ces jours-ci.'
+    },
+    {
+      icon: '🌿',
+      label: 'Pour ce soir',
+      quote: 'Tu n\'as pas à tout gérer parfaitement.',
+      sub: 'Le repos est aussi une forme de productivité. Permets-toi de souffler.'
+    },
+    {
+      icon: '💜',
+      label: 'Un souffle',
+      quote: 'Tes émotions sont valides, même les plus intenses.',
+      sub: 'Tu ne perds pas pied — tu es humaine. Et c\'est exactement ce qu\'il faut être.'
+    },
+    {
+      icon: '🕯️',
+      label: 'Petit rappel',
+      quote: 'Tu as traversé ça avant. Tu le traverseras encore.',
+      sub: 'Et à chaque fois, tu t\'en sors. Parce que tu es plus résiliente que tu ne le penses.'
+    },
+    {
+      icon: '🧸',
+      label: 'Avec douceur',
+      quote: 'Si tu avais une amie qui vivait ce que tu vis, tu lui dirais d\'être gentille avec elle-même.',
+      sub: 'Alors fais de même pour toi. Tu le mérites autant qu\'elle.'
+    },
+    {
+      icon: '🌸',
+      label: 'Pour toi',
+      quote: 'Un peu de chocolat, un plaid chaud, une série — c\'est suffisant ce soir.',
+      sub: 'Prendre soin de soi, c\'est aussi ça. Sans culpabilité.'
+    },
+    {
+      icon: '💫',
+      label: 'Ce que tu portes',
+      quote: 'Tu portes beaucoup. Et tu le fais avec une grâce que tu ne vois pas.',
+      sub: 'Ceux qui t\'entourent le voient, eux. Laisse-toi être vue.'
+    },
+  ],
+};
+
+// Sélectionne le message du jour selon la phase et le jour dans le cycle
+function getDailyMessage(phase, cycleDay, cycleLength, ovDay, periodLength) {
+  let pool, indexBase;
+
+  // Pré-ovulation = 6 jours avant l'ovulation + jour d'ovulation
+  const daysToOvul = ovDay - cycleDay;
+  if (daysToOvul >= 0 && daysToOvul <= 6) {
+    pool = dailyMessages.preovulation;
+    indexBase = cycleDay;
+  } else if (phase === 'period') {
+    pool = dailyMessages.period;
+    indexBase = cycleDay;
+  } else if (phase === 'follicular') {
+    pool = dailyMessages.follicular;
+    indexBase = cycleDay - periodLength;
+  } else {
+    pool = dailyMessages.luteal;
+    indexBase = cycleDay - ovDay;
+  }
+
+  // Varie selon le jour ET le numéro de cycle (différent à chaque cycle)
+  const cycleNum = getLastPeriodDate()
+    ? Math.floor((new Date() - getLastPeriodDate()) / (cycleLength * 86400000))
+    : 0;
+
+  const idx = (indexBase + cycleNum * 7) % pool.length;
+  return pool[Math.max(0, idx)];
+}
+
+function showDailyMessage(msg) {
+  const card = document.getElementById('confidence-card');
+  if (!msg) { card.style.display = 'none'; return; }
+  card.style.display = 'block';
+  document.getElementById('conf-icon').textContent = msg.icon;
+  document.getElementById('conf-label').textContent = msg.label;
+  document.getElementById('conf-quote').textContent = `${msg.quote}`;
+  document.getElementById('conf-sub').textContent = msg.sub;
+}
+
+// ========== MINI TEST (accueil) ==========
+let miniTestResult = null;
+let showMiniTime = false;
+
+function openQuickTest() {
+  const panel = document.getElementById('mini-test-panel');
+  panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+  // Set today's date
+  document.getElementById('mt-date').value = new Date().toISOString().split('T')[0];
+}
+
+function closeMiniTest() {
+  document.getElementById('mini-test-panel').style.display = 'none';
+  miniTestResult = null;
+  document.getElementById('mt-pos').classList.remove('selected','positive');
+  document.getElementById('mt-neg').classList.remove('selected','negative');
+  document.getElementById('mt-status').textContent = '';
+}
+
+function selectMiniResult(result) {
+  miniTestResult = result;
+  document.getElementById('mt-pos').classList.toggle('selected', result === 'positive');
+  document.getElementById('mt-neg').classList.toggle('selected', result === 'negative');
+  document.getElementById('mt-pos').classList.toggle('positive', result === 'positive');
+  document.getElementById('mt-neg').classList.toggle('negative', result === 'negative');
+}
+
+function toggleMiniTime() {
+  showMiniTime = !showMiniTime;
+  document.getElementById('mt-time-wrap').style.display = showMiniTime ? 'block' : 'none';
+  document.getElementById('mt-time-toggle').classList.toggle('active', showMiniTime);
+  document.getElementById('mt-time-toggle').textContent = showMiniTime ? '⏰ Masquer l\'heure' : '⏰ Ajouter l\'heure (optionnel)';
+}
+
+function submitMiniTest() {
+  const dateVal = document.getElementById('mt-date').value;
+  const timeVal = document.getElementById('mt-time').value;
+  if (!miniTestResult) { showToast('Sélectionne Positif ou Négatif 🧪'); return; }
+  if (!dateVal) { showToast('Indique la date 📅'); return; }
+
+  // Add to shared ovulTests list
+  ovulTests.push({ date: dateVal, time: timeVal || null, result: miniTestResult });
+  ovulTests.sort((a, b) => {
+    const da = new Date(a.date + (a.time ? 'T' + a.time : 'T12:00'));
+    const db = new Date(b.date + (b.time ? 'T' + b.time : 'T12:00'));
+    return da - db;
+  });
+
+  // Sync to calendar screen too
+  renderOvulHistory();
+  computeOvulation();
+
+  // Show result in mini panel
+  const status = document.getElementById('mt-status');
+  const calStatus = document.getElementById('ovul-status');
+  status.textContent = calStatus.textContent || (miniTestResult === 'negative' ? '🔵 Test négatif noté. Continue demain !' : '✅ Test enregistré !');
+
+  showToast('Test enregistré ✅');
+  miniTestResult = null;
+  document.getElementById('mt-pos').classList.remove('selected','positive');
+  document.getElementById('mt-neg').classList.remove('selected','negative');
+}
+
+// ========== OVULATION TEST ==========
+let ovulTestResult = null;
+let ovulTests = []; // { date, time, result }
+let showTimeInput = false;
+
+function selectOvulResult(result) {
+  ovulTestResult = result;
+  document.getElementById('ovul-pos').classList.toggle('selected', result === 'positive');
+  document.getElementById('ovul-neg').classList.toggle('selected', result === 'negative');
+  document.getElementById('ovul-pos').classList.toggle('positive', result === 'positive');
+  document.getElementById('ovul-neg').classList.toggle('negative', result === 'negative');
+}
+
+function toggleTimeInput() {
+  showTimeInput = !showTimeInput;
+  document.getElementById('ovul-time-wrap').style.display = showTimeInput ? 'block' : 'none';
+  document.getElementById('ovul-time-toggle').classList.toggle('active', showTimeInput);
+  document.getElementById('ovul-time-toggle').textContent = showTimeInput ? '⏰ Masquer l\'heure' : '⏰ Ajouter l\'heure (optionnel)';
+}
+
+function addOvulTest() {
+  const dateVal = document.getElementById('ovul-date').value;
+  const timeVal = document.getElementById('ovul-time').value;
+  const status = document.getElementById('ovul-status');
+
+  if (!ovulTestResult) { showToast('Sélectionne Positif ou Négatif 🧪'); return; }
+  if (!dateVal) { showToast('Indique la date du test 📅'); return; }
+
+  // Add to list
+  ovulTests.push({ date: dateVal, time: timeVal || null, result: ovulTestResult });
+
+  // Sort by date+time
+  ovulTests.sort((a, b) => {
+    const da = new Date(a.date + (a.time ? 'T' + a.time : 'T12:00'));
+    const db = new Date(b.date + (b.time ? 'T' + b.time : 'T12:00'));
+    return da - db;
+  });
+
+  // Reset UI
+  ovulTestResult = null;
+  document.getElementById('ovul-pos').classList.remove('selected','positive');
+  document.getElementById('ovul-neg').classList.remove('selected','negative');
+  document.getElementById('ovul-time').value = '';
+
+  renderOvulHistory();
+  computeOvulation();
+  saveData();
+  showToast('Test enregistré ✅');
+}
+
+function renderOvulHistory() {
+  const wrap = document.getElementById('ovul-history');
+  const list = document.getElementById('ovul-history-list');
+  if (ovulTests.length === 0) { wrap.style.display = 'none'; return; }
+  wrap.style.display = 'block';
+  list.innerHTML = '';
+  ovulTests.forEach((t, i) => {
+    const d = new Date(t.date + 'T12:00');
+    const dateStr = d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
+    const el = document.createElement('div');
+    el.className = 'ovul-history-item';
+    el.innerHTML = `
+      <span class="hi-result">${t.result === 'positive' ? '✅' : '❌'}</span>
+      <span style="flex:1">
+        <span class="hi-date">${dateStr}</span>
+        ${t.time ? `<span class="hi-time"> · ${t.time}</span>` : ''}
+      </span>
+      <button class="hi-del" onclick="deleteOvulTest(${i})">✕</button>
+    `;
+    list.appendChild(el);
+  });
+}
+
+function deleteOvulTest(i) {
+  ovulTests.splice(i, 1);
+  // Si plus aucun test → retour à la valeur théorique du cycle
+  if (ovulTests.length === 0) {
+    userData.customOvDay = null;
+    renderCalendar();
+    updateAll();
+    saveData();
+    document.getElementById('ovul-status').innerHTML = '';
+    document.getElementById('ovul-history').style.display = 'none';
+    return;
+  }
+  renderOvulHistory();
+  computeOvulation();
+  saveData();
+}
+
+// ========== HELPERS MOMENTS ==========
+// Tranches horaires : Matin 6-12, Après-midi 12-18, Soir 18-23, Nuit 23-6
+function getMoment(date) {
+  const h = date.getHours();
+  if (h >= 6 && h < 12) return 'matin';
+  if (h >= 12 && h < 18) return 'après-midi';
+  if (h >= 18 && h < 23) return 'soir';
+  return 'nuit';
+}
+
+function fmtMoment(date) {
+  const day = date.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+  const moment = getMoment(date);
+  return `${day} (${moment})`;
+}
+
+function fmtDay(date) {
+  return date.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+}
+
+function computeOvulation() {
+  const status = document.getElementById('ovul-status');
+  if (ovulTests.length === 0) { status.textContent = ''; return; }
+
+  // Convertit chaque test en objet avec date JS
+  const tests = ovulTests.map(t => ({
+    ...t,
+    dt: new Date(t.date + (t.time ? 'T' + t.time : 'T12:00'))
+  })).sort((a, b) => a.dt - b.dt);
+
+  const positives = tests.filter(t => t.result === 'positive');
+  const negatives = tests.filter(t => t.result === 'negative');
+
+  if (positives.length === 0) {
+    // Tous négatifs → décaler la date d'ovulation après le dernier test négatif
+    const lastNeg = negatives[negatives.length - 1];
+    const lastNegDate = lastNeg.dt;
+    const earliestOvul = new Date(lastNegDate.getTime() + 36 * 3600000);
+
+    // Mettre à jour customOvDay seulement si ça repousse la date
+    const _lpRef = getLastPeriodDate();
+    if (_lpRef) {
+      const lp = new Date(_lpRef); lp.setHours(0,0,0,0);
+      const earliestOvulDay = new Date(earliestOvul); earliestOvulDay.setHours(0,0,0,0);
+      const newOvDay = Math.round((earliestOvulDay - lp) / 86400000) + 1;
+      const currentOvDay = userData.customOvDay || Math.round(userData.cycleLength - 14);
+      if (newOvDay > currentOvDay) {
+        userData.customOvDay = newOvDay;
+        renderCalendar();
+        updateAll();
+      }
+    }
+
+    const moment = getMoment(earliestOvul);
+    const dayStr = earliestOvul.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+    status.innerHTML = `🔵 Pas encore de pic LH détecté. Ton ovulation ne peut potentiellement pas avoir lieu avant le ${dayStr} (${moment}). Continue les tests chaque jour à la même heure.`;
+    return;
+  }
+
+  // Premier test positif
+  const firstPos = positives[0];
+  const firstPosDate = firstPos.dt;
+  const hasTime = !!firstPos.time;
+
+  // Dernier test négatif AVANT le premier positif
+  const lastNegBefore = negatives
+    .filter(t => t.dt < firstPosDate)
+    .sort((a, b) => b.dt - a.dt)[0];
+
+  // Premier test négatif APRÈS le dernier positif
+  const lastPos = positives[positives.length - 1];
+  const firstNegAfter = negatives
+    .filter(t => t.dt > lastPos.dt)
+    .sort((a, b) => a.dt - b.dt)[0];
+
+  // ---- CALCUL DE LA BORNE BASSE (ovulation au plus tôt) ----
+  // Logique : délai avant ovulation = 36h - temps écoulé depuis le dernier négatif
+  // Si pas de négatif avant → on ne peut pas calculer la borne basse
+  let ovulEarly = null;   // borne basse
+  let ovulLate = null;    // borne haute
+  let hasNegBefore = !!lastNegBefore;
+  let hasNegAfter = !!firstNegAfter;
+
+  if (hasNegBefore) {
+    const gapMs = firstPosDate - lastNegBefore.dt;
+    const gapHours = gapMs / 3600000;
+    // Le pic a démarré entre lastNeg et firstPos
+    // Borne basse : 36h après le début du pic (au plus tôt = si le pic a commencé juste après le dernier négatif)
+    // Borne haute sans négatif après : 36h après le premier positif (cas où pic a commencé juste avant le positif)
+    const earliestPicStart = lastNegBefore.dt;
+    const latestPicStart = firstPosDate;
+    ovulEarly = new Date(earliestPicStart.getTime() + 36 * 3600000);
+    ovulLate = new Date(latestPicStart.getTime() + 36 * 3600000);
+  } else {
+    // Pas de négatif avant → on ne sait pas depuis combien de temps le pic dure
+    // L'ovulation peut être imminente ou déjà en cours
+    // Borne basse = maintenant (potentiellement déjà en cours)
+    ovulEarly = new Date(firstPosDate); // pourrait être déjà passée
+    ovulLate = new Date(firstPosDate.getTime() + 36 * 3600000);
+  }
+
+  // ---- AFFINAGE AVEC LE NÉGATIF APRÈS ----
+  // Si on a un négatif après le positif, le pic est retombé → ovulation avant ce négatif
+  if (hasNegAfter) {
+    ovulLate = new Date(Math.min(ovulLate.getTime(), firstNegAfter.dt.getTime()));
+  }
+
+  // ---- MISE À JOUR DU CALENDRIER ----
+  // On utilise la borne basse (ovulEarly) pour placer le marqueur,
+  // ce qui correspond au premier jour possible d'ovulation
+  const _lpRef = getLastPeriodDate();
+  if (_lpRef) {
+    const lp = new Date(_lpRef); lp.setHours(0,0,0,0);
+    const ovulEarlyDay = new Date(ovulEarly); ovulEarlyDay.setHours(0,0,0,0);
+    const newOvDay = Math.round((ovulEarlyDay - lp) / 86400000) + 1;
+    userData.customOvDay = newOvDay;
+    renderCalendar();
+    updateAll();
+  }
+
+  // ---- CONSTRUCTION DU MESSAGE ----
+  let msg = '';
+  const now = new Date();
+  const ovulPast = ovulLate < now; // toute la fenêtre est dans le passé
+
+  if (!hasNegBefore) {
+    // Cas dégradé : pas de négatif avant → incertitude maximale
+    msg = `🥚 Ton pic de LH a été détecté, mais sans test négatif la veille, nous ne pouvons pas déterminer précisément quand il a commencé. Ton ovulation a potentiellement eu lieu dès le ${fmtMoment(ovulEarly)}, ou pourrait encore survenir d'ici le ${fmtMoment(ovulLate)}.`;
+    msg += `<br><small style="color:var(--text-muted)">💡 Pour plus de précision, fais des tests chaque jour à la même heure afin d'avoir un résultat négatif la veille du positif.</small>`;
+  } else {
+    const sameDayWindow = fmtDay(ovulEarly) === fmtDay(ovulLate);
+
+    if (ovulPast) {
+      if (sameDayWindow) {
+        msg = `🥚 Tu as potentiellement ovulé ${fmtMoment(ovulEarly)}.`;
+      } else {
+        msg = `🥚 Tu as potentiellement ovulé entre le ${fmtMoment(ovulEarly)} et le ${fmtMoment(ovulLate)}.`;
+      }
+      if (hasNegAfter) {
+        msg += ` Ton pic de LH est retombé, ce qui confirme que ta fenêtre ovulatoire est probablement terminée.`;
+      }
+    } else {
+      if (sameDayWindow) {
+        msg = `🥚 Ton ovulation est potentiellement prévue pour le ${fmtMoment(ovulEarly)}.`;
+      } else {
+        msg = `🥚 Ton ovulation surviendra potentiellement entre le ${fmtMoment(ovulEarly)} et le ${fmtMoment(ovulLate)}.`;
+      }
+      if (hasNegAfter) {
+        msg += ` Ton pic de LH est déjà retombé, ce qui affine cette estimation.`;
+      }
+    }
+    msg += ` Calendrier mis à jour ✨`;
+    msg += `<br><small style="color:var(--text-muted)">Ces estimations sont basées sur une moyenne théorique de 36h et ne remplacent pas un avis médical.</small>`;
+  }
+
+  status.innerHTML = msg;
+}
+
+// ========== GREETING ==========
+function updateGreeting(name) {
+  const h = new Date().getHours();
+  let time = h < 12 ? 'Bonjour' : h < 18 ? 'Bon après-midi' : 'Bonsoir';
+  document.getElementById('greeting-time').textContent = time;
+  document.getElementById('greeting-name').textContent = name || 'mon amie';
+}
+
+// ========== CYCLE CALC ==========
+function getCycleDay() {
+  const lp = getLastPeriodDate();
+  if (!lp) return 1;
+  const today = new Date(); today.setHours(0,0,0,0);
+  lp.setHours(0,0,0,0);
+  const diff = Math.floor((today - lp) / 86400000);
+  return (diff % userData.cycleLength) + 1;
+}
+
+function getPhase(day, ovDay, pd) {
+  ovDay = ovDay || Math.round(userData.cycleLength - 14);
+  pd = pd || userData.periodLength;
+  if (day <= pd) return 'period';
+  if (day <= ovDay - 2) return 'follicular';
+  if (day <= ovDay + 1) return 'ovulation';
+  return 'luteal';
+}
+
+const phaseInfo = {
+  period: {
+    name: 'Règles 🩸',
+    sub: 'Prends soin de toi et repose-toi 💕',
+    tip: 'Règles',
+    body: 'Privilégie le repos, la chaleur et des aliments riches en fer (légumineuses, épinards). Le yoga doux et la marche peuvent soulager les crampes.',
+    color: 'linear-gradient(145deg,#c45080,#9a2858)'
+  },
+  follicular: {
+    name: 'Folliculaire 🌱',
+    sub: 'Ton énergie remonte doucement 🌱',
+    tip: 'Phase folliculaire',
+    body: 'C\'est le bon moment pour commencer de nouveaux projets et faire du sport intensif. Ton énergie et ta créativité sont en hausse !',
+    color: 'linear-gradient(145deg,#6b3a5e,#8a3070)'
+  },
+  ovulation: {
+    name: 'Ovulation 🥚',
+    sub: 'Tu es au sommet de ton énergie ✨',
+    tip: 'Ovulation',
+    body: 'Tu es au sommet de ta forme ! Excellent moment pour les défis sociaux, professionnels et sportifs. Fenêtre fertile : sois attentive à ta contraception.',
+    color: 'linear-gradient(145deg,#9a3080,#c45090)'
+  },
+  luteal: {
+    name: 'Lutéale 🌙',
+    sub: 'Phase de ralentissement doux 🌙',
+    tip: 'Phase lutéale',
+    body: 'Ton corps se prépare. Tu pourrais ressentir des symptômes prémenstruels. Privilégie le magnésium, le sommeil et les activités douces comme le yoga.',
+    color: 'linear-gradient(145deg,#5a2a5e,#7a3a6e)'
+  },
+};
+
+function updateAll() {
+  const day = getCycleDay();
+  const pd = userData.periodLength;
+  const ovDay = userData.customOvDay || Math.round(userData.cycleLength - 14);
+  // Si ovulation détectée via tests → on affine la longueur du cycle (ovulation + 14j de phase lutéale)
+  const cl = userData.customOvDay ? userData.customOvDay + 14 : userData.cycleLength;
+  const phase = getPhase(day, ovDay, pd);
+  const info = phaseInfo[phase];
+
+  // Ring
+  const circumference = 2 * Math.PI * 55;
+  const fill = document.getElementById('ring-fill');
+  fill.style.strokeDasharray = circumference;
+  fill.style.strokeDashoffset = circumference * (1 - day / cl);
+
+  document.getElementById('ring-day').textContent = day;
+  document.getElementById('ring-total').textContent = `sur ${cl} jours`;
+  document.getElementById('phase-name').textContent = info.name;
+  document.getElementById('phase-sub').textContent = info.sub;
+  document.getElementById('cycle-hero').style.background = info.color;
+
+  // Tags
+  const daysToNextPeriod = cl - day + 1;
+  const daysToOvul = ovDay - day;
+  document.getElementById('tag-next').textContent = daysToNextPeriod > 0 ? `🩸 Règles dans ${daysToNextPeriod}j` : '🩸 Règles en cours';
+  document.getElementById('tag-ovul').textContent = daysToOvul > 0 ? `🥚 Ovulation dans ${daysToOvul}j` : daysToOvul === 0 ? '🥚 Ovulation aujourd\'hui !' : '🥚 Post-ovulation';
+
+  // Tip
+  document.getElementById('tip-title').textContent = info.tip;
+  document.getElementById('tip-body').textContent = info.body;
+
+  // Stats
+  document.getElementById('stat-cycle').textContent = cl;
+  document.getElementById('stat-period').textContent = pd;
+  document.getElementById('stat-day').textContent = `J${day}`;
+
+  // Phase highlight
+  ['ph-period','ph-follic','ph-ovul','ph-luteal'].forEach(id => document.getElementById(id).classList.remove('current'));
+  const phMap = {period:'ph-period',follicular:'ph-follic',ovulation:'ph-ovul',luteal:'ph-luteal'};
+  document.getElementById(phMap[phase]).classList.add('current');
+
+  // Phase days
+  document.getElementById('ph-period-days').textContent = `J1–J${pd}`;
+  document.getElementById('ph-follic-days').textContent = `J${pd+1}–J${ovDay-2}`;
+  document.getElementById('ph-ovul-days').textContent = `J${ovDay}`;
+  document.getElementById('ph-luteal-days').textContent = `J${ovDay+2}–J${cl}`;
+
+  // Greeting
+  updateGreeting(userData.name);
+
+  // Message du jour — toujours affiché, change selon la phase et le jour
+  const msg = getDailyMessage(phase, day, cl, ovDay, pd);
+  showDailyMessage(msg);
+}
+
+function togglePeriod() {
+  const todayStr = toDateStr(new Date());
+  // Check if today is already a period day
+  const existing = getCycleForDate(todayStr);
+  if (existing !== null) {
+    // Remove this cycle
+    userData.cycles.splice(existing, 1);
+    showToast('Règles retirées ✅');
+  } else {
+    // Add new cycle starting today
+    userData.cycles.push({ start: todayStr, length: userData.periodLength });
+    userData.cycles.sort((a, b) => a.start.localeCompare(b.start));
+    showToast('Début des règles enregistré 🩸');
+  }
+  updateAll();
+  renderCalendar();
+  saveData();
+}
+
+// ========== CALENDAR ==========
+const months_fr = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+const days_fr = ['L','M','M','J','V','S','D'];
+
+function getDayType(date) {
+  const d = new Date(date); d.setHours(0,0,0,0);
+  const ovDay = userData.customOvDay || Math.round(userData.cycleLength - 14);
+  const cl = userData.customOvDay ? userData.customOvDay + 14 : userData.cycleLength;
+  const dStr = toDateStr(d);
+
+  // 1. Check real recorded cycles
+  for (const cycle of userData.cycles) {
+    const start = new Date(cycle.start + 'T12:00'); start.setHours(0,0,0,0);
+    const diff = Math.floor((d - start) / 86400000);
+    if (diff >= 0 && diff < cycle.length) return 'period';
+  }
+
+  // 2. Predict future cycles from last recorded cycle
+  const lp = getLastPeriodDate();
+  if (!lp) return null;
+  lp.setHours(0,0,0,0);
+
+  for (let c = 1; c <= 4; c++) {
+    const predStart = new Date(lp.getTime() + c * cl * 86400000);
+    const diff = Math.floor((d - predStart) / 86400000);
+    if (diff >= 0 && diff < userData.periodLength) return 'predicted';
+    // Fertile & ovulation windows for predicted cycles
+    if (diff >= 0 && diff < cl) {
+      const cycDay = diff + 1;
+      if (cycDay >= ovDay - 4 && cycDay <= ovDay - 1) return 'fertile';
+      if (cycDay === ovDay) return 'ovulation';
+    }
+  }
+
+  // 3. Fertile & ovulation for current cycle
+  for (const cycle of userData.cycles) {
+    const start = new Date(cycle.start + 'T12:00'); start.setHours(0,0,0,0);
+    const diff = Math.floor((d - start) / 86400000);
+    if (diff >= 0 && diff < cl) {
+      const cycDay = diff + 1;
+      if (cycDay >= ovDay - 4 && cycDay <= ovDay - 1) return 'fertile';
+      if (cycDay === ovDay) return 'ovulation';
+    }
+  }
+
+  return null;
+}
+
+// Find which recorded cycle a date belongs to (or null)
+function getCycleForDate(dateStr) {
+  const d = new Date(dateStr + 'T12:00'); d.setHours(0,0,0,0);
+  for (let i = 0; i < userData.cycles.length; i++) {
+    const cycle = userData.cycles[i];
+    const start = new Date(cycle.start + 'T12:00'); start.setHours(0,0,0,0);
+    const diff = Math.floor((d - start) / 86400000);
+    if (diff >= 0 && diff < cycle.length) return i;
+  }
+  return null;
+}
+
+function renderCalendar() {
+  const label = document.getElementById('cal-month-label');
+  label.textContent = `${months_fr[calViewMonth]} ${calViewYear}`;
+  const grid = document.getElementById('cal-grid');
+  grid.innerHTML = '';
+
+  // Day headers
+  days_fr.forEach(d => {
+    const el = document.createElement('div');
+    el.className = 'cal-dow'; el.textContent = d;
+    grid.appendChild(el);
+  });
+
+  const firstDay = new Date(calViewYear, calViewMonth, 1);
+  let startDow = firstDay.getDay(); // 0=Sun
+  startDow = startDow === 0 ? 6 : startDow - 1; // Mon=0
+
+  for (let i = 0; i < startDow; i++) {
+    const el = document.createElement('div'); el.className = 'cal-day empty';
+    grid.appendChild(el);
+  }
+
+  const daysInMonth = new Date(calViewYear, calViewMonth + 1, 0).getDate();
+  const today = new Date(); today.setHours(0,0,0,0);
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const el = document.createElement('div');
+    el.className = 'cal-day';
+    el.textContent = d;
+    const date = new Date(calViewYear, calViewMonth, d);
+    const dateStr = `${calViewYear}-${String(calViewMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    if (date.getTime() === today.getTime()) el.classList.add('today');
+    const type = getDayType(date);
+    if (type) el.classList.add(type);
+    const clickType = type || 'follicular';
+    el.onclick = () => onCalDayClick(dateStr, clickType);
+    grid.appendChild(el);
+  }
+}
+
+function prevMonth() {
+  calViewMonth--;
+  if (calViewMonth < 0) { calViewMonth = 11; calViewYear--; }
+  renderCalendar();
+}
+function nextMonth() {
+  calViewMonth++;
+  if (calViewMonth > 11) { calViewMonth = 0; calViewYear++; }
+  renderCalendar();
+}
+
+// ========== CONTRACEPTION ==========
+function updateContraUI() {
+  const contra = userData.contraception;
+  const showPill = ['pill','minipill','patch','ring'].includes(contra);
+  document.getElementById('pill-reminder').style.display = showPill ? 'flex' : 'none';
+  document.querySelectorAll('.contra-btn').forEach(btn => btn.classList.remove('selected'));
+  const map = {pill:0,minipill:1,iud:2,implant:3,condom:4,none:5};
+  const idx = map[contra];
+  if (idx !== undefined) document.querySelectorAll('.contra-btn')[idx]?.classList.add('selected');
+}
+
+function selectContra(btn, type) {
+  userData.contraception = type;
+  document.querySelectorAll('.contra-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  updateContraUI();
+  saveData();
+  showToast('Contraception mise à jour ✅');
+}
+
+function takePill() {
+  userData.pillTaken = true;
+  document.getElementById('pill-status').textContent = '✅ Prise aujourd\'hui !';
+  document.getElementById('pill-btn').textContent = '✓';
+  document.getElementById('pill-btn').style.background = '#e8fce8';
+  showToast('Pilule enregistrée 💊✅');
+}
+
+// ========== BODY ==========
+function toggleSymptom(btn) { btn.classList.toggle('selected'); }
+function selectFlow(btn, flow) {
+  document.querySelectorAll('.flow-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  userData.flow = flow;
+}
+
+// ========== ADVICE SYSTEM ==========
+const symptomAdvice = {
+  'Crampes': {
+    icon: '🤕',
+    title: 'Soulager les crampes',
+    tips: [
+      { icon: '🌡️', text: 'Pose une bouillotte chaude sur le ventre ou le bas du dos — la chaleur détend les muscles et réduit la douleur.' },
+      { icon: '🚶‍♀️', text: 'Une petite marche douce ou du yoga léger peut aider à libérer des endorphines naturelles.' },
+      { icon: '💧', text: 'Bois de l\'eau chaude ou une tisane de gingembre ou cannelle — elles ont des propriétés anti-inflammatoires douces.' },
+      { icon: '🛁', text: 'Un bain chaud peut détendre l\'ensemble du corps et apaiser les spasmes.' },
+    ]
+  },
+  'Maux de tête': {
+    icon: '🧠',
+    title: 'Apaiser les maux de tête',
+    tips: [
+      { icon: '💧', text: 'Bois un grand verre d\'eau — la déshydratation est souvent en cause pendant le cycle.' },
+      { icon: '🌑', text: 'Repose-toi dans une pièce sombre et calme quelques minutes. Les yeux fermés, respire lentement.' },
+      { icon: '👐', text: 'Masse doucement tes tempes avec deux doigts en petits cercles pendant 1-2 minutes.' },
+      { icon: '☕', text: 'Un peu de caféine (thé ou café léger) peut parfois soulager, mais évite l\'excès.' },
+    ]
+  },
+  'Fatigue': {
+    icon: '😴',
+    title: 'Récupérer de la fatigue',
+    tips: [
+      { icon: '🛌', text: 'Accorde-toi une courte sieste de 15-20 minutes si possible. Pas plus, pour ne pas perturber la nuit.' },
+      { icon: '🥩', text: 'Mange des aliments riches en fer — lentilles, épinards, viande rouge — pour compenser les pertes.' },
+      { icon: '🚫', text: 'Évite les tâches non urgentes. Aujourd\'hui, l\'essentiel suffit.' },
+      { icon: '🍵', text: 'Une tisane à la réglisse ou à l\'ortie peut aider à redonner de l\'énergie en douceur.' },
+    ]
+  },
+  'Nausée': {
+    icon: '🤢',
+    title: 'Calmer la nausée',
+    tips: [
+      { icon: '🫚', text: 'Mange de petites quantités régulièrement plutôt qu\'un grand repas — l\'estomac vide aggrave la nausée.' },
+      { icon: '🫛', text: 'Le gingembre est ton allié : thé au gingembre, biscuits secs ou bonbons au gingembre.' },
+      { icon: '🌬️', text: 'Respire lentement par le nez et expire par la bouche. L\'air frais aide aussi.' },
+      { icon: '🚫', text: 'Évite les odeurs fortes, les aliments gras ou très sucrés le temps que ça passe.' },
+    ]
+  },
+  'Ballonnements': {
+    icon: '💧',
+    title: 'Réduire les ballonnements',
+    tips: [
+      { icon: '🫖', text: 'Une tisane de menthe poivrée ou de fenouil aide à diminuer les gaz et les gonflements.' },
+      { icon: '🚶‍♀️', text: 'Une marche légère de 10-15 minutes après les repas favorise la digestion.' },
+      { icon: '🥗', text: 'Évite temporairement les choux, légumineuses et boissons gazeuses.' },
+      { icon: '🧘‍♀️', text: 'Le massage abdominal dans le sens des aiguilles d\'une montre peut aider à libérer la pression.' },
+    ]
+  },
+  'Envies': {
+    icon: '🍫',
+    title: 'Gérer les envies',
+    tips: [
+      { icon: '🍫', text: 'Un carré de chocolat noir (70%+) est ok — le magnésium qu\'il contient aide vraiment ton corps.' },
+      { icon: '🫐', text: 'Les fruits sucrés comme les dattes ou les bananes comblent l\'envie de sucre plus sainement.' },
+      { icon: '🥜', text: 'Une poignée de noix ou d\'amandes stabilise la glycémie et réduit les fringales.' },
+      { icon: '💡', text: 'Les envies intenses sont souvent un signal de manque en magnésium ou en fer. Écoute ton corps !' },
+    ]
+  },
+  'Sensibilité seins': {
+    icon: '🌡️',
+    title: 'Soulager la sensibilité',
+    tips: [
+      { icon: '👙', text: 'Porte un soutien-gorge confortable et bien ajusté, sans armatures si possible ces jours-ci.' },
+      { icon: '❄️', text: 'Une compresse fraîche (pas glacée) posée quelques minutes peut réduire l\'inflammation.' },
+      { icon: '☕', text: 'Réduis temporairement la caféine — elle peut augmenter la sensibilité des seins.' },
+      { icon: '🧂', text: 'Limite le sel qui favorise la rétention d\'eau et aggrave la sensibilité.' },
+    ]
+  },
+  'Insomnie': {
+    icon: '💤',
+    title: 'Retrouver le sommeil',
+    tips: [
+      { icon: '📵', text: 'Pose ton téléphone 30 minutes avant de dormir — la lumière bleue perturbe la mélatonine.' },
+      { icon: '🌡️', text: 'Refroidis légèrement ta chambre. Le corps s\'endort mieux dans un environnement frais.' },
+      { icon: '🫖', text: 'Une tisane de valériane, de camomille ou de lavande favorise la détente.' },
+      { icon: '🧘‍♀️', text: 'Essaie la respiration 4-7-8 : inspire 4s, retiens 7s, expire 8s. Répète 3 fois.' },
+    ]
+  },
+  'Bouffées': {
+    icon: '🔥',
+    title: 'Gérer les bouffées de chaleur',
+    tips: [
+      { icon: '🌬️', text: 'Aère la pièce ou utilise un ventilateur. L\'air frais aide à réguler la température.' },
+      { icon: '💧', text: 'Bois de l\'eau fraîche régulièrement et garde-en toujours à portée de main.' },
+      { icon: '👚', text: 'Privilégie les vêtements en matières naturelles (coton, lin) faciles à superposer.' },
+      { icon: '🧊', text: 'Un glaçon sur le poignet ou la nuque peut apporter un soulagement rapide.' },
+    ]
+  },
+};
+
+const moodAdvice = {
+  'sad': {
+    icon: '😢',
+    title: 'Prendre soin de ta tristesse',
+    tips: [
+      { icon: '🌸', text: 'La tristesse en phase prémenstruelle est normale et temporaire. Accueille-la sans te juger.' },
+      { icon: '🎵', text: 'Mets ta musique préférée — la musique a un effet direct sur l\'humeur en quelques minutes.' },
+      { icon: '☀️', text: 'Si possible, sors quelques minutes à la lumière naturelle — elle booste la sérotonine.' },
+      { icon: '🤗', text: 'Partage ce que tu ressens avec quelqu\'un en qui tu as confiance. Tu n\'as pas à porter ça seule.' },
+    ]
+  },
+  'anxious': {
+    icon: '😰',
+    title: 'Apaiser l\'anxiété',
+    tips: [
+      { icon: '🌬️', text: 'Respire profondément : 4 secondes d\'inspiration, 4 de rétention, 6 d\'expiration. Répète 5 fois.' },
+      { icon: '🦶', text: 'Pose les pieds à plat au sol, sens leur contact. Nomme 5 choses que tu vois autour de toi.' },
+      { icon: '🚶‍♀️', text: 'Bouge un peu — même 5 minutes de marche désamorcent le cycle de l\'anxiété.' },
+      { icon: '📝', text: 'Écris ce qui t\'inquiète sur un papier pour sortir ça de ta tête.' },
+    ]
+  },
+  'irritable': {
+    icon: '😤',
+    title: 'Désamorcer l\'irritabilité',
+    tips: [
+      { icon: '🏃‍♀️', text: 'L\'exercice physique est le meilleur exutoire — même une courte session libère des endorphines.' },
+      { icon: '🧘‍♀️', text: 'Prends 2 minutes seule, en silence. L\'irritabilité hormonale passe plus vite qu\'on ne le croit.' },
+      { icon: '🍫', text: 'Mange quelque chose — la glycémie basse amplifie souvent l\'irritabilité.' },
+      { icon: '💬', text: 'Si tu dois parler à quelqu\'un, préviens-le doucement que tu traverses une journée difficile.' },
+    ]
+  },
+  'happy': null,
+  'calm': null,
+};
+
+function saveSymptoms() {
+  const selected = [...document.querySelectorAll('.symptom-btn.selected')];
+  userData.symptoms = selected.map(b => b.dataset.symptom);
+
+  if (selected.length === 0 && !userData.mood) {
+    showToast('Sélectionne au moins un symptôme ou une humeur 🌸');
+    return;
+  }
+
+  showToast('Enregistré ✅');
+
+  // Build advice from symptoms + mood
+  const adviceItems = [];
+
+  // Mood advice first
+  if (userData.mood && moodAdvice[userData.mood]) {
+    showAdvicePopup(userData.mood, userData.symptoms);
+    return;
+  }
+
+  // Symptoms advice
+  if (selected.length > 0) {
+    showAdvicePopup(null, userData.symptoms);
+  }
+}
+
+function showAdvicePopup(mood, symptoms) {
+  // Remove existing popup
+  const existing = document.getElementById('advice-popup');
+  if (existing) existing.remove();
+
+  const tips = [];
+  let mainIcon = '💡';
+  let mainTitle = 'Conseils pour aujourd\'hui';
+
+  // Collect tips from mood
+  if (mood && moodAdvice[mood]) {
+    const m = moodAdvice[mood];
+    mainIcon = m.icon;
+    mainTitle = m.title;
+    tips.push(...m.tips);
+  }
+
+  // Collect tips from symptoms (max 2 tips per symptom, max 3 symptoms)
+  const symLimit = mood ? 1 : 3;
+  let symCount = 0;
+  symptoms.forEach(s => {
+    if (symCount >= symLimit) return;
+    if (symptomAdvice[s]) {
+      if (!mood) { mainIcon = symptomAdvice[s].icon; mainTitle = symptomAdvice[s].title; }
+      tips.push(...symptomAdvice[s].tips.slice(0, mood ? 1 : 2));
+      symCount++;
+    }
+  });
+
+  if (tips.length === 0) return;
+
+  // If multiple symptoms, use generic title
+  if (symptoms.length > 1 && !mood) {
+    mainIcon = '💡'; mainTitle = 'Conseils pour aujourd\'hui';
+  }
+
+  const popup = document.createElement('div');
+  popup.className = 'advice-popup'; popup.id = 'advice-popup';
+  popup.innerHTML = `
+    <div class="advice-sheet">
+      <span class="advice-icon">${mainIcon}</span>
+      <h3>${mainTitle}</h3>
+      <div class="advice-list">
+        ${tips.slice(0, 4).map(t => `
+          <div class="advice-item">
+            <span class="a-icon">${t.icon}</span>
+            <span class="a-text">${t.text}</span>
+          </div>
+        `).join('')}
+      </div>
+      <button class="advice-close" onclick="document.getElementById('advice-popup').remove()">Merci ! 🌸</button>
+    </div>
+  `;
+  popup.addEventListener('click', e => { if (e.target === popup) popup.remove(); });
+  document.body.appendChild(popup);
+}
+
+function selectMood(btn, mood) {
+  document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  userData.mood = mood;
+  // Show advice immediately for negative moods
+  if (moodAdvice[mood]) {
+    setTimeout(() => showAdvicePopup(mood, userData.symptoms || []), 300);
+  }
+}
+
+function getFertilityData(type, daysToOvul) {
+  // daysToOvul: positive = days BEFORE ovulation, negative = days AFTER
+  let pct, color, label, tip;
+
+  // POST-OVULATION: always low regardless of type
+  if (daysToOvul < 0) {
+    const daysAfter = Math.abs(daysToOvul);
+    if (daysAfter <= 1) {
+      pct = 10; label = 'Très faible'; color = '#d4c8e8';
+      tip = 'L\'ovule n\'est viable que 12-24h. La fenêtre se referme rapidement.';
+    } else if (daysAfter <= 3) {
+      pct = 3; label = 'Très faible'; color = '#c8d8e8';
+      tip = 'L\'ovule n\'est plus viable. Les chances de conception sont quasi nulles.';
+    } else {
+      pct = 1; label = 'Nulle'; color = '#c8d8e8';
+      tip = 'Phase lutéale. Les chances de conception sont pratiquement nulles jusqu\'au prochain cycle.';
+    }
+    return { pct, color, label, tip };
+  }
+
+  // PRE-OVULATION & OVULATION: use type + daysToOvul
+  if (type === 'period') {
+    // During period: very low but not zero (sperm can survive ~5 days)
+    if (daysToOvul >= 10) {
+      pct = 2; label = 'Très faible'; color = '#c8d8e8';
+      tip = 'Les spermatozoïdes survivent jusqu\'à 5 jours, mais ton ovulation est encore loin. Les chances sont très basses ce jour-ci.';
+    } else if (daysToOvul >= 7) {
+      pct = 8; label = 'Faible'; color = '#d4c8e8';
+      tip = 'Ton ovulation approche. Les spermatozoïdes déposés maintenant pourraient théoriquement survivre jusqu\'à l\'ovulation, mais les chances restent faibles.';
+    } else {
+      pct = 15; label = 'Faible à modérée'; color = '#e8c8d8';
+      tip = 'L\'ovulation n\'est plus très loin. Des rapports maintenant pourraient coïncider avec ta fenêtre fertile si des spermatozoïdes survivent.';
+    }
+  } else if (type === 'follicular') {
+    if (daysToOvul > 5) {
+      pct = 10; label = 'Faible'; color = '#d4c8e8';
+      tip = 'Phase folliculaire précoce. L\'ovulation est encore à venir — les chances augmentent progressivement.';
+    } else if (daysToOvul > 3) {
+      pct = 18; label = 'Faible à modérée'; color = '#e8c8d8';
+      tip = 'Tu te rapproches de ta fenêtre fertile. Les rapports dans les prochains jours augmenteront tes chances.';
+    } else if (daysToOvul === 3) {
+      pct = 25; label = 'Modérée'; color = '#e8b8d0';
+      tip = 'La fenêtre fertile commence à s\'ouvrir. C\'est un bon moment pour commencer.';
+    } else if (daysToOvul === 2) {
+      pct = 28; label = 'Bonne'; color = '#e89ab8';
+      tip = 'Tu es à 2 jours de l\'ovulation. Les spermatozoïdes déposés maintenant seront en bonne position.';
+    } else {
+      pct = 30; label = 'Très bonne'; color = '#e07094';
+      tip = 'La veille de l\'ovulation est l\'une des périodes les plus fertiles. Excellente fenêtre pour concevoir.';
+    }
+  } else if (type === 'fertile') {
+    if (daysToOvul >= 4) {
+      pct = 18; label = 'Faible à modérée'; color = '#e8c8d8';
+      tip = 'Tu entres dans ta fenêtre fertile. Les rapports maintenant peuvent augmenter tes chances.';
+    } else if (daysToOvul >= 2) {
+      pct = 25; label = 'Modérée'; color = '#e8b8d0';
+      tip = 'Bonne période fertile. Les spermatozoïdes peuvent survivre jusqu\'à l\'ovulation.';
+    } else {
+      pct = 30; label = 'Très bonne'; color = '#e07094';
+      tip = 'Tu es très proche de l\'ovulation. C\'est l\'une des meilleures fenêtres pour concevoir.';
+    }
+  } else if (type === 'fertile_old_removed') {
+    if (daysToOvul >= 3) {
+      pct = 20; label = 'Modérée'; color = '#e8b8d0';
+      tip = 'Tu entres dans ta fenêtre fertile. C\'est le bon moment pour commencer si tu veux concevoir.';
+    } else {
+      pct = 28; label = 'Bonne'; color = '#e89ab8';
+      tip = 'Tu es très proche de l\'ovulation. Les spermatozoïdes déposés maintenant seront prêts à l\'ovulation.';
+    }
+  } else if (type === 'ovulation') {
+    pct = 33; label = 'Maximale 🌟'; color = 'linear-gradient(90deg,#e07094,#c9a0c0)';
+    tip = 'C\'est ta fenêtre de fertilité maximale ! L\'ovule est libéré et viable environ 12 à 24 heures. C\'est le meilleur moment pour concevoir.';
+  } else {
+    // Fallback
+    pct = 1; label = 'Nulle'; color = '#c8d8e8';
+    tip = 'Aucune chance de conception estimée pour ce jour.';
+  }
+  return { pct, color, label, tip };
+}
+
+function onCalDayClick(dateStr, type) {
+  const existing = document.getElementById('cal-day-popup');
+  if (existing) existing.remove();
+
+  const date = new Date(dateStr + 'T12:00');
+  const dateLabel = date.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+  const today = new Date(); today.setHours(0,0,0,0);
+  const isFuture = date > today;
+  const ovDay = userData.customOvDay || Math.round(userData.cycleLength - 14);
+
+  // Calculate days to ovulation for this date
+  let daysToOvul = null;
+  const _lp2 = getLastPeriodDate();
+  if (_lp2) {
+    const lp = new Date(_lp2); lp.setHours(0,0,0,0);
+    let totalDays = Math.floor((date - lp) / 86400000);
+    let cyclePos = totalDays % userData.cycleLength;
+    if (cyclePos < 0) cyclePos += userData.cycleLength;
+    const dayInCycle = cyclePos + 1;
+    daysToOvul = ovDay - dayInCycle;
+  }
+
+  const phaseLabels = {
+    period: { label: 'Règles 🩸', cls: 'period', info: 'Ton corps renouvelle sa muqueuse utérine. Repos et chaleur sont tes meilleurs alliés.' },
+    follicular: { label: 'Folliculaire 🌱', cls: 'follicular', info: 'Les follicules se développent et l\'énergie remonte progressivement.' },
+    ovulation: { label: 'Ovulation 🥚', cls: 'ovulation', info: 'Pic d\'énergie et de confiance. Fenêtre de fertilité maximale.' },
+    fertile: { label: 'Période fertile 🌸', cls: 'fertile', info: 'Les chances de conception sont élevées ces jours-ci.' },
+    luteal: { label: 'Lutéale 🌙', cls: 'luteal', info: 'Le corps se prépare pour le prochain cycle. Douceur et magnésium recommandés.' },
+  };
+
+  const phInfo = phaseLabels[type] || { label: 'Jour du cycle', cls: 'follicular', info: 'Phase de ton cycle.' };
+
+  // Fertility meter HTML
+  let fertilityHTML = '';
+  if (userData.wantsToConceive && daysToOvul !== null) {
+    const f = getFertilityData(type, daysToOvul);
+    fertilityHTML = `
+      <div class="fertility-meter">
+        <div class="fertility-meter-label">🌱 Chances de conception</div>
+        <div class="fertility-pct" style="color:${f.color.startsWith('linear') ? 'var(--rose-deep)' : f.color}">${f.pct}%</div>
+        <div class="fertility-bar-wrap">
+          <div class="fertility-bar" style="width:${f.pct * 3}%;background:${f.color}"></div>
+        </div>
+        <div class="fertility-pct-sub">${f.label} — ${isFuture ? 'prévision' : 'estimation'} pour ce jour</div>
+        <div class="fertility-tip">${f.tip}</div>
+      </div>
+    `;
+  }
+
+  let extraNote = isFuture
+    ? `<p style="font-size:0.75rem;color:var(--text-muted);margin-top:8px;">🔮 Prévision basée sur ton cycle de ${userData.cycleLength} jours.</p>`
+    : '';
+
+  // Period edit panel
+  let periodEditHTML = '';
+  const cycleIdx = getCycleForDate(dateStr);
+
+  if (cycleIdx !== null) {
+    // This day belongs to a recorded cycle
+    const cycle = userData.cycles[cycleIdx];
+    const cycleStart = new Date(cycle.start + 'T12:00'); cycleStart.setHours(0,0,0,0);
+    const clickedDay = new Date(dateStr + 'T12:00'); clickedDay.setHours(0,0,0,0);
+    const dayNum = Math.round((clickedDay - cycleStart) / 86400000) + 1;
+    periodEditHTML = `
+      <div class="period-edit-box">
+        <div class="period-edit-title">✏️ Modifier ces règles</div>
+        <button class="period-edit-btn end" style="width:100%;margin-bottom:8px" onclick="setPeriodEnd('${dateStr}', ${cycleIdx})">
+          ✅ Dernier jour de règles ici (J${dayNum})
+        </button>
+        <button class="period-edit-btn remove" style="width:100%" onclick="removeCycle(${cycleIdx})">
+          ✕ Ce n'était pas mes règles — tout supprimer
+        </button>
+      </div>
+    `;
+  } else if (!isFuture) {
+    // Past non-period day — offer to start a cycle here
+    periodEditHTML = `
+      <div class="period-edit-box" style="background:white;border-color:rgba(202,160,192,0.2);">
+        <div class="period-edit-title" style="color:var(--text-muted)">📝 Ajouter</div>
+        <button class="period-edit-btn start" style="width:100%" onclick="addPeriodStart('${dateStr}')">
+          🩸 Mes règles ont commencé ce jour-là
+        </button>
+      </div>
+    `;
+  }
+
+  const popup = document.createElement('div');
+  popup.className = 'cal-day-popup'; popup.id = 'cal-day-popup';
+  popup.innerHTML = `
+    <div class="cal-day-sheet">
+      <h3>${dateLabel.charAt(0).toUpperCase() + dateLabel.slice(1)}</h3>
+      <div class="cal-day-phase">
+        <span class="phase-badge ${phInfo.cls}">${phInfo.label}</span>
+      </div>
+      <div class="cal-day-info">${phInfo.info}${extraNote}</div>
+      ${fertilityHTML}
+      ${periodEditHTML}
+      <button class="cal-day-close" style="margin-top:14px" onclick="document.getElementById('cal-day-popup').remove()">Fermer</button>
+    </div>
+  `;
+  popup.addEventListener('click', e => { if (e.target === popup) popup.remove(); });
+  document.body.appendChild(popup);
+}
+
+// ========== PERIOD EDIT ==========
+
+function addPeriodStart(dateStr) {
+  // Start a new cycle on this date
+  const existing = getCycleForDate(dateStr);
+  if (existing !== null) {
+    showToast('Ces règles existent déjà 🌸'); return;
+  }
+  userData.cycles.push({ start: dateStr, length: userData.periodLength });
+  userData.cycles.sort((a, b) => a.start.localeCompare(b.start));
+  userData.customOvDay = null;
+  refreshAfterPeriodEdit();
+  showToast('Règles ajoutées 🩸');
+}
+
+function setPeriodEnd(dateStr, cycleIndex) {
+  // Resize cycle so that dateStr is the last day (inclusive)
+  const cycle = userData.cycles[cycleIndex];
+  if (!cycle) return;
+  const start = new Date(cycle.start + 'T12:00'); start.setHours(0,0,0,0);
+  const end = new Date(dateStr + 'T12:00'); end.setHours(0,0,0,0);
+  const days = Math.round((end - start) / 86400000) + 1;
+  if (days < 1) { showToast('Ce jour est avant le début des règles 🌸'); return; }
+  if (days > 14) { showToast('Durée trop longue 🌸'); return; }
+  userData.cycles[cycleIndex].length = days;
+  userData.customOvDay = null;
+  refreshAfterPeriodEdit();
+  showToast(`Fin des règles mise à jour — ${days} jours ✅`);
+}
+
+function removeCycle(cycleIndex) {
+  // Remove the entire cycle — does NOT affect other cycles
+  userData.cycles.splice(cycleIndex, 1);
+  userData.customOvDay = null;
+  refreshAfterPeriodEdit();
+  showToast('Règles supprimées ✅');
+}
+
+function refreshAfterPeriodEdit() {
+  const popup = document.getElementById('cal-day-popup');
+  if (popup) popup.remove();
+  renderCalendar();
+  updateAll();
+  saveData();
+}
+
+// ========== LUNA IA ==========
+function initChat() {
+  const day = getCycleDay();
+  const phase = getPhase(day);
+  const names = {period:'règles',follicular:'folliculaire',ovulation:'ovulation',luteal:'lutéale'};
+  const phaseName = names[phase];
+  chatHistory = [
+    {
+      role: 'user',
+      content: `Tu es Luna, une assistante santé féminine bienveillante, chaleureuse et experte en santé menstruelle. Tu t'adresses à ${userData.name}. Elle est actuellement au jour ${day} de son cycle de ${userData.cycleLength} jours, en phase ${phaseName}. Sa contraception : ${userData.contraception}. Réponds toujours en français, de façon douce, empathique et personnalisée. Tes réponses font 2-4 phrases maximum sauf si plus de détails sont demandés. Ne te présente jamais à nouveau.`
+    },
+    {
+      role: 'assistant',
+      content: `Bonjour ${userData.name} ! Je suis Luna, ton assistante santé féminine. Je suis là pour répondre à tes questions sur ton cycle, ta contraception, et comment adapter ta vie à chaque phase. Que voudrais-tu savoir ? 💕`
+    }
+  ];
+}
+
+async function sendMsg() {
+  const input = document.getElementById('chat-input');
+  const msg = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+
+  addMsg(msg, 'user');
+  chatHistory.push({role:'user', content: msg});
+
+  // Typing indicator
+  const typingEl = document.createElement('div');
+  typingEl.className = 'msg luna';
+  typingEl.innerHTML = '<div class="msg-name">🌙 Luna</div><div class="typing"><span></span><span></span><span></span></div>';
+  document.getElementById('chat-area').appendChild(typingEl);
+  scrollChat();
+
+  try {
+    const messages = chatHistory.slice(0);
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: `Tu es Luna, une assistante santé féminine bienveillante et experte en santé menstruelle. Tu t'adresses à ${userData.name}. Elle est au jour ${getCycleDay()} de son cycle de ${userData.cycleLength} jours. Phase actuelle : ${getPhase(getCycleDay())}. Contraception : ${userData.contraception}. Humeur du jour : ${userData.mood || 'non renseignée'}. Symptômes : ${userData.symptoms.join(', ') || 'aucun signalé'}. Réponds toujours en français, de façon douce, empathique et personnalisée. Maximum 4 phrases, utilise des emojis avec parcimonie. Donne des conseils pratiques et fondés.`,
+        messages: chatHistory.filter(m => m.role !== 'system').slice(-10),
+      })
+    });
+    const data = await response.json();
+    const reply = data.content?.[0]?.text || 'Je suis là pour toi 💕 Peux-tu reformuler ta question ?';
+    typingEl.remove();
+    addMsg(reply, 'luna');
+    chatHistory.push({role:'assistant', content: reply});
+  } catch(e) {
+    typingEl.remove();
+    addMsg('Je rencontre un petit souci de connexion 🌸 Réessaie dans un instant !', 'luna');
+  }
+}
+
+function addMsg(text, from) {
+  const el = document.createElement('div');
+  el.className = `msg ${from}`;
+  if (from === 'luna') el.innerHTML = `<div class="msg-name">🌙 Luna</div>${text}`;
+  else el.textContent = text;
+  document.getElementById('chat-area').appendChild(el);
+  scrollChat();
+}
+
+function scrollChat() {
+  const area = document.getElementById('chat-area');
+  area.scrollTop = area.scrollHeight;
+}
+
+function quickAsk(q) {
+  showScreen('luna-ai', document.querySelectorAll('.nav-btn')[3]);
+  setTimeout(() => {
+    document.getElementById('chat-input').value = q;
+    sendMsg();
+  }, 100);
+}
+
+// ========== NAV ==========
+function showScreen(id, btn) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(`screen-${id}`).classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+
+// ========== TOAST ==========
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// Set today's date as default in onboarding and ovul test
+const todayStr = new Date().toISOString().split('T')[0];
+document.getElementById('ob-last').value = todayStr;
+document.getElementById('ob-last').max = todayStr;
+document.getElementById('ovul-date').value = todayStr;
+document.getElementById('ovul-date').max = todayStr;
+
+// Charger les données sauvegardées
+loadData();
+if (userData.cycles && userData.cycles.length > 0 && userData.name && userData.name !== 'Utilisatrice') {
+  // Données existantes valides → on passe directement à l'app
+  document.getElementById('onboarding').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  updateAll();
+  renderCalendar();
+  updateContraUI();
+  initChat();
+  updateGreeting(userData.name);
+  renderOvulHistory();
+  if (ovulTests.length > 0) computeOvulation();
+}
+</script>
+</body>
+</html>
