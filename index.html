@@ -3867,6 +3867,7 @@ async function generateShareLink() {
 
   } catch(e) {
     // Fallback vers lien statique si JSONBin échoue
+    showToast('Erreur: ' + e.message);
     const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(shareData))));
     const url = window.location.origin + window.location.pathname + '?share=' + encoded;
     copyToClipboard(url);
