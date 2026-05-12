@@ -322,23 +322,23 @@
     /* ---- ONBOARDING ---- */
     #onboarding {
       position: fixed; inset: 0; z-index: 100;
-      background: linear-gradient(160deg, var(--plum) 0%, #8a3070 60%, var(--rose-deep) 100%);
+      background: linear-gradient(160deg, #fce8ef 0%, #e8d4e5 60%, #f0d4e8 100%);
       display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
-      padding: 48px 32px 60px; text-align: center; transition: opacity 0.5s ease;
+      padding: 56px 24px 60px; text-align: center; transition: opacity 0.5s ease;
       overflow-y: scroll; -webkit-overflow-scrolling: touch;
     }
     #onboarding.hidden { opacity: 0; pointer-events: none; }
     .ob-conception-row { display: flex; gap: 8px; margin-top: 4px; }
     .ob-conception-btn {
       flex: 1; border: 2px solid var(--mauve-light); border-radius: 14px;
-      padding: 10px 6px; background: white; cursor: pointer;
-      font-family: 'Nunito', sans-serif; font-size: 0.78rem; font-weight: 700;
+      padding: 12px 6px; background: white; cursor: pointer;
+      font-family: 'Nunito', sans-serif; font-size: 0.82rem; font-weight: 700;
       color: var(--text-muted); transition: all 0.2s; text-align: center;
       -webkit-appearance: none;
     }
     .ob-conception-btn.selected {
-      background: linear-gradient(135deg, var(--blush), var(--mauve-light));
-      border-color: var(--rose-deep); color: var(--plum);
+      background: linear-gradient(135deg, var(--rose), var(--rose-deep));
+      border-color: var(--rose-deep); color: white;
     }
 
     /* ---- FERTILITY METER ---- */
@@ -376,12 +376,13 @@
       font-size: 0.78rem; color: var(--plum); line-height: 1.5;
       background: rgba(255,255,255,0.6); border-radius: 12px; padding: 10px;
     }
-    .ob-logo em { font-style: italic; color: var(--rose); }
-    .ob-tagline { color: rgba(255,255,255,0.75); font-size: 1rem; margin-bottom: 40px; }
-    .ob-card { background: white; border-radius: 24px; padding: 28px; width: 100%; max-width: 340px; margin-bottom: 20px; }
-    .ob-card h3 { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--plum); margin-bottom: 16px; font-weight: 700; }
+    .ob-logo em { font-style: italic; color: var(--plum); font-size: 2rem; font-family: 'Playfair Display', serif; font-weight: 700; }
+    .ob-logo-icon { font-size: 3rem; margin-bottom: 8px; display: block; }
+    .ob-tagline { color: var(--plum-light); font-size: 0.95rem; margin-bottom: 32px; font-weight: 500; }
+    .ob-card { background: white; border-radius: 28px; padding: 28px; width: 100%; max-width: 360px; margin-bottom: 16px; box-shadow: 0 8px 32px rgba(107,58,94,0.12); }
+    .ob-card h3 { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--plum); margin-bottom: 20px; font-weight: 700; }
     .ob-field { margin-bottom: 14px; text-align: left; }
-    .ob-field label { font-size: 0.78rem; color: var(--text-muted); font-weight: 500; display: block; margin-bottom: 5px; }
+    .ob-field label { font-size: 0.78rem; color: var(--text-muted); font-weight: 600; display: block; margin-bottom: 5px; letter-spacing: 0.02em; }
     .ob-field input, .ob-field select {
       width: 100%; border: 1.5px solid var(--mauve-light); border-radius: 12px;
       padding: 10px 14px; font-family: 'Nunito', sans-serif; font-size: 0.88rem;
@@ -389,10 +390,10 @@
       box-sizing: border-box;
     }
     .ob-btn {
-      width: 100%; max-width: 340px; padding: 18px; border: none; border-radius: 16px; cursor: pointer;
-      background: linear-gradient(135deg, var(--rose), var(--rose-deep));
+      width: 100%; max-width: 360px; padding: 18px; border: none; border-radius: 16px; cursor: pointer;
+      background: linear-gradient(135deg, var(--plum), var(--plum-light));
       color: white; font-family: 'Nunito', sans-serif; font-size: 1rem; font-weight: 700;
-      box-shadow: 0 6px 20px rgba(224,112,148,0.4); transition: transform 0.2s;
+      box-shadow: 0 6px 20px rgba(107,58,94,0.3); transition: transform 0.2s;
       margin-top: 8px; margin-bottom: 60px; display: block;
       -webkit-appearance: none;
     }
@@ -725,10 +726,11 @@
 
 <!-- ONBOARDING -->
 <div id="onboarding">
+  <span class="ob-logo-icon">🌸</span>
   <div class="ob-logo"><em>MyFlower</em></div>
-  <p class="ob-tagline">Ton cycle, ta vie, en harmonie 🌸</p>
+  <p class="ob-tagline">Ton cycle, ta vie, en harmonie</p>
   <div class="ob-card">
-    <h3>Bienvenue 🌸</h3>
+    <h3>Bienvenue</h3>
     <div class="ob-field">
       <label>Ton prénom</label>
       <input type="text" id="ob-name" placeholder="Marie" />
@@ -764,10 +766,10 @@
       <label>Tu cherches à concevoir ?</label>
       <div class="ob-conception-row">
         <button class="ob-conception-btn" id="ob-conceive-yes" onclick="selectConception(true)">
-          👶 Oui, j'essaie
+          Oui, j'essaie
         </button>
         <button class="ob-conception-btn" id="ob-conceive-no" onclick="selectConception(false)">
-          🚫 Non, pas pour l'instant
+          Non, pas pour l'instant
         </button>
       </div>
     </div>
@@ -955,6 +957,9 @@
           <div class="stat-num" id="stat-day">J8</div>
           <div class="stat-lbl">Aujourd'hui</div>
         </div>
+      </div>
+      <div id="fertile-countdown" style="display:none;margin-top:12px;padding:10px 14px;background:linear-gradient(135deg,#fce8ef,#f0d4e8);border-radius:14px;text-align:center;">
+        <div id="fertile-countdown-text" style="font-size:0.85rem;font-weight:700;color:var(--plum);"></div>
       </div>
     </div>
 
@@ -1731,6 +1736,35 @@ function getDailyMessage(phase, cycleDay, cycleLength, ovDay, periodLength) {
   return pool[Math.max(0, idx)];
 }
 
+function updateFertileCountdown(day, ovDay) {
+  const el = document.getElementById('fertile-countdown');
+  const txt = document.getElementById('fertile-countdown-text');
+  if (!el || !txt) return;
+
+  if (!userData.wantsToConceive) { el.style.display = 'none'; return; }
+
+  const fertileStart = ovDay - 4;
+  const fertileEnd = ovDay + 1;
+  const daysToStart = fertileStart - day;
+  const daysToEnd = fertileEnd - day;
+
+  let message = '';
+  if (day >= fertileStart && day <= fertileEnd) {
+    if (daysToEnd === 0) message = "Dernier jour de ta fenêtre fertile aujourd'hui";
+    else if (daysToEnd === 1) message = "Fenêtre fertile — il reste 1 jour";
+    else message = `Fenêtre fertile en cours — encore ${daysToEnd} jours`;
+  } else if (daysToStart > 0 && daysToStart <= 10) {
+    if (daysToStart === 1) message = "Ta fenêtre fertile commence demain";
+    else message = `Ta fenêtre fertile commence dans ${daysToStart} jours`;
+  } else {
+    el.style.display = 'none';
+    return;
+  }
+
+  txt.textContent = message;
+  el.style.display = 'block';
+}
+
 function showDailyMessage(msg) {
   const card = document.getElementById('confidence-card');
   if (!msg) { card.style.display = 'none'; return; }
@@ -2260,6 +2294,7 @@ function updateAll() {
 
   const msg = getDailyMessage(phase, day, cl, ovDay, pd);
   showDailyMessage(msg);
+  updateFertileCountdown(day, ovDay);
   // Sync partenaire en arrière-plan
   if (window.firebaseReady) syncPartnerData();
 }
@@ -5158,7 +5193,7 @@ function showPartnerView(key) {
 function renderPartnerContent(data) {
   const phaseColors = {
     period: { bg: 'linear-gradient(135deg,#f2a7bb,#e07094)', text: 'white' },
-    follicular: { bg: 'linear-gradient(135deg,#d4ecd4,#a8d8a8)', text: '#2d6a2d' },
+    follicular: { bg: 'linear-gradient(135deg,#fef3c7,#fde68a)', text: '#92400e' },
     ovulation: { bg: 'linear-gradient(135deg,#c9a0c0,#9a5a8a)', text: 'white' },
     luteal: { bg: 'linear-gradient(135deg,#fde8c8,#f5c897)', text: '#7a4a00' }
   };
@@ -5170,7 +5205,7 @@ function renderPartnerContent(data) {
   const dayNames = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
   const phaseColorsCal = {
     period: '#f2a7bb',
-    follicular: '#e8d4e5',
+    follicular: '#fef3c7',
     ovulation: '#c9a0c0',
     luteal: '#fde8c8',
     fertile: '#e8d4e5',
