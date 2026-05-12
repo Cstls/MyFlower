@@ -4141,7 +4141,8 @@ function onCalDayClick(dateStr, type) {
   const date = new Date(dateStr + 'T12:00');
   const dateLabel = date.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
   const today = new Date(); today.setHours(0,0,0,0);
-  const isFuture = date > today;
+  const dateOnly = new Date(dateStr); dateOnly.setHours(0,0,0,0);
+  const isFuture = dateOnly > today;
   const { day: ovDay } = getEffectiveOvDay();
 
   // Calculate days to ovulation for this date
@@ -4832,6 +4833,7 @@ function buildPartnerData() {
   const phase = getPhase(day, ovDay, pd);
   const daysToOvul = ovDay - day;
   const daysToNextPeriod = cl - day;
+  const today = new Date().toISOString().split('T')[0];
 
   const phaseLabels = {
     period: 'Règles',
@@ -4847,15 +4849,49 @@ function buildPartnerData() {
     luteal: "Elle entre dans la phase pré-menstruelle. Elle peut avoir besoin de plus de calme et de compréhension. Sa patience peut être plus limitée — c'est normal."
   };
 
+  // Humeur du jour
+  const todayEntry = userData.dailyLogs?.[today] || {};
+  const moodLabels = { '😊':'Bonne humeur', '😐':'Neutre', '😢':'Triste', '😤':'Irritable', '😴':'Fatiguée', '🤩':'Super !' };
+  const mood = todayEntry.mood ? (moodLabels[todayEntry.mood] || todayEntry.mood) : null;
+
+  // Tests d'ovulation récents (5 derniers)
+  const recentTests = [...(ovulTests || [])]
+    .sort((a, b) => b.date.localeCompare(a.date))
+    .slice(0, 3)
+    .map(t => ({ date: t.date, result: t.result }));
+
+  // Prochaine fenêtre fertile
+  const fertileStart = ovDay - 4;
+  const fertileEnd = ovDay;
+  let fertileMsg = '';
+  if (daysToOvul > 4) {
+    fertileMsg = `Dans ${daysToOvul - 4} jour${daysToOvul - 4 > 1 ? 's' : ''}`;
+  } else if (daysToOvul >= 0 && daysToOvul <= 4) {
+    fertileMsg = 'En cours maintenant';
+  } else {
+    fertileMsg = 'Passée — prochain cycle bientôt';
+  }
+
+  // Fertilité du jour
+  let fertilityPct = null;
+  if (userData.wantsToConceive) {
+    const f = getFertilityData(phase, daysToOvul);
+    fertilityPct = f ? f.pct : null;
+  }
+
   return {
     name: userData.name,
     phase: phaseLabels[phase],
     phaseKey: phase,
     cycleDay: day,
     cycleLength: cl,
-    daysToOvul: daysToOvul,
-    daysToNextPeriod: daysToNextPeriod,
+    daysToOvul,
+    daysToNextPeriod,
     tip: partnerTips[phase],
+    mood,
+    recentTests,
+    fertileMsg,
+    fertilityPct,
     wantsToConceive: userData.wantsToConceive || false,
     updatedAt: new Date().toISOString()
   };
@@ -5095,25 +5131,69 @@ function renderPartnerContent(data) {
     luteal: '#fde8c8'
   };
   const bg = phaseColors[data.phaseKey] || '#f9e4ef';
-  const updated = new Date(data.updatedAt).toLocaleDateString('fr-FR', { day:'numeric', month:'long' });
+  const updated = new Date(data.updatedAt).toLocaleDateString('fr-FR', { day:'numeric', month:'long', hour:'2-digit', minute:'2-digit' });
 
-  let fertileHtml = '';
-  if (data.wantsToConceive && data.daysToOvul !== undefined) {
-    if (data.daysToOvul === 0) {
-      fertileHtml = `<div style="background:#f9e4ef;border-radius:14px;padding:14px;margin-top:12px;text-align:center;"><div style="font-weight:700;color:#6b3a5e;">Jour d'ovulation</div><div style="font-size:0.78rem;color:#9a5a8a;margin-top:4px;">C'est le jour le plus fertile</div></div>`;
-    } else if (data.daysToOvul > 0 && data.daysToOvul <= 4) {
-      fertileHtml = `<div style="background:#f9e4ef;border-radius:14px;padding:14px;margin-top:12px;text-align:center;"><div style="font-weight:700;color:#6b3a5e;">Fenêtre fertile — J-${data.daysToOvul}</div></div>`;
-    }
+  // Humeur
+  const moodHtml = data.mood
+    ? `<div style="display:flex;align-items:center;gap:8px;margin-top:12px;padding:10px 14px;background:#fdf6f9;border-radius:12px;">
+        <div style="font-size:0.78rem;color:#9a5a8a;font-weight:600;">Humeur aujourd'hui</div>
+        <div style="font-size:0.82rem;color:#6b3a5e;font-weight:700;margin-left:auto;">${data.mood}</div>
+       </div>`
+    : '';
+
+  // Fenêtre fertile
+  const fertileHtml = `
+    <div style="display:flex;align-items:center;gap:8px;margin-top:8px;padding:10px 14px;background:#fdf6f9;border-radius:12px;">
+      <div style="font-size:0.78rem;color:#9a5a8a;font-weight:600;">Fenêtre fertile</div>
+      <div style="font-size:0.82rem;color:#6b3a5e;font-weight:700;margin-left:auto;">${data.fertileMsg || '—'}</div>
+    </div>`;
+
+  // Fertilité
+  const fertilityHtml = data.wantsToConceive && data.fertilityPct !== null
+    ? `<div style="display:flex;align-items:center;gap:8px;margin-top:8px;padding:10px 14px;background:#fdf6f9;border-radius:12px;">
+        <div style="font-size:0.78rem;color:#9a5a8a;font-weight:600;">Chances de conception</div>
+        <div style="font-size:0.82rem;color:#6b3a5e;font-weight:700;margin-left:auto;">${data.fertilityPct}%</div>
+       </div>`
+    : '';
+
+  // Tests récents
+  let testsHtml = '';
+  if (data.recentTests && data.recentTests.length > 0) {
+    const rows = data.recentTests.map(t => {
+      const d = new Date(t.date + 'T12:00').toLocaleDateString('fr-FR', { day:'numeric', month:'short' });
+      const r = t.result === 'positive' ? '✅ Positif' : '❌ Négatif';
+      return `<div style="display:flex;justify-content:space-between;font-size:0.78rem;padding:4px 0;border-bottom:1px solid #f0e8f5;">
+        <span style="color:#9a5a8a;">${d}</span>
+        <span style="color:#6b3a5e;font-weight:600;">${r}</span>
+      </div>`;
+    }).join('');
+    testsHtml = `
+      <div style="margin-top:16px;">
+        <div style="font-size:0.78rem;font-weight:700;color:#9a5a8a;margin-bottom:8px;">Tests d'ovulation récents</div>
+        ${rows}
+      </div>`;
   }
 
+  // Prochaines règles
+  const nextPeriodHtml = data.daysToNextPeriod > 0
+    ? `<div style="display:flex;align-items:center;gap:8px;margin-top:8px;padding:10px 14px;background:#fdf6f9;border-radius:12px;">
+        <div style="font-size:0.78rem;color:#9a5a8a;font-weight:600;">Prochaines règles</div>
+        <div style="font-size:0.82rem;color:#6b3a5e;font-weight:700;margin-left:auto;">Dans ${data.daysToNextPeriod} jour${data.daysToNextPeriod > 1 ? 's' : ''}</div>
+       </div>`
+    : '';
+
   document.getElementById('partner-content').innerHTML = `
-    <div style="background:white;border-radius:24px;padding:24px;box-shadow:0 4px 24px rgba(107,58,94,0.1);margin-bottom:16px;">
-      <div style="font-size:1.1rem;font-weight:700;color:#6b3a5e;margin-bottom:4px;">${data.name}</div>
-      <div style="display:inline-block;background:${bg};border-radius:20px;padding:4px 14px;font-size:0.78rem;font-weight:600;color:#6b3a5e;margin-bottom:16px;">${data.phase} — J${data.cycleDay}</div>
+    <div style="background:white;border-radius:24px;padding:24px;box-shadow:0 4px 24px rgba(107,58,94,0.1);margin-bottom:12px;">
+      <div style="font-size:1.1rem;font-weight:700;color:#6b3a5e;margin-bottom:6px;">${data.name}</div>
+      <div style="display:inline-block;background:${bg};border-radius:20px;padding:4px 14px;font-size:0.78rem;font-weight:600;color:#6b3a5e;margin-bottom:12px;">${data.phase} — J${data.cycleDay} / ${data.cycleLength}</div>
+      ${moodHtml}
       ${fertileHtml}
-      <div style="margin-top:16px;font-size:0.88rem;color:#555;line-height:1.6;">${data.tip}</div>
+      ${fertilityHtml}
+      ${nextPeriodHtml}
+      ${testsHtml}
+      <div style="margin-top:16px;font-size:0.85rem;color:#666;line-height:1.6;border-top:1px solid #f0e8f5;padding-top:14px;">${data.tip}</div>
     </div>
-    <div style="text-align:center;font-size:0.72rem;color:#aaa;">Mis à jour le ${updated}</div>
+    <div style="text-align:center;font-size:0.7rem;color:#bbb;">Mis à jour le ${updated}</div>
   `;
 }
 
