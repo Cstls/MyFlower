@@ -1295,6 +1295,9 @@
         <button onclick="sharePartnerLink()" style="width:100%;padding:14px;border:none;border-radius:14px;background:white;color:var(--plum);border:2px solid var(--mauve-light);font-family:'Nunito',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;margin-top:8px;">
           Partager avec mon partenaire
         </button>
+        <button onclick="revokePartnerAccess()" id="revoke-partner-btn" style="display:none;width:100%;padding:12px;border:none;border-radius:14px;background:white;color:#c0392b;border:2px solid #f5c6c6;font-family:'Nunito',sans-serif;font-size:0.85rem;font-weight:700;cursor:pointer;margin-top:6px;">
+          Révoquer l'accès partenaire
+        </button>
       </div>
     </div>
 
@@ -3711,6 +3714,7 @@ function openProfile() {
   updateNotifToggles();
   const objSelect = document.getElementById('prof-objectif');
   if (objSelect) objSelect.value = userData.wantsToConceive ? 'conceive' : 'simple';
+  updatePartnerBtns();
 }
 
 function saveProfile() {
@@ -4817,6 +4821,27 @@ function copyToClipboard(url) {
 
 // ========== MODE PARTENAIRE FIREBASE ==========
 
+async function revokePartnerAccess() {
+  // Supprimer les données de l'ancien lien sur Firebase
+  if (window.firebaseReady && userData.partnerKey) {
+    try {
+      await window.firebaseSet('partners/' + userData.partnerKey, null);
+    } catch(e) {}
+  }
+  // Générer une nouvelle clé
+  userData.partnerKey = 'mf_' + Math.random().toString(36).substr(2, 9);
+  saveData();
+  // Cacher le bouton révoquer
+  const btn = document.getElementById('revoke-partner-btn');
+  if (btn) btn.style.display = 'none';
+  showToast('Accès partenaire révoqué ✅');
+}
+
+function updatePartnerBtns() {
+  const btn = document.getElementById('revoke-partner-btn');
+  if (btn) btn.style.display = userData.partnerKey ? 'block' : 'none';
+}
+
 function getPartnerKey() {
   if (!userData.partnerKey) {
     userData.partnerKey = 'mf_' + Math.random().toString(36).substr(2, 9);
@@ -4916,6 +4941,7 @@ function getPartnerLink() {
 async function sharePartnerLink() {
   await syncPartnerData();
   const url = getPartnerLink();
+  updatePartnerBtns();
   if (navigator.share) {
     navigator.share({ title: 'MyFlower — Vue partenaire', url });
   } else {
@@ -5125,36 +5151,99 @@ function showPartnerView(key) {
 
 function renderPartnerContent(data) {
   const phaseColors = {
-    period: '#f9d0dc',
-    follicular: '#d4ecd4',
-    ovulation: '#e8d4e5',
-    luteal: '#fde8c8'
+    period: { bg: 'linear-gradient(135deg,#f2a7bb,#e07094)', text: 'white' },
+    follicular: { bg: 'linear-gradient(135deg,#d4ecd4,#a8d8a8)', text: '#2d6a2d' },
+    ovulation: { bg: 'linear-gradient(135deg,#c9a0c0,#9a5a8a)', text: 'white' },
+    luteal: { bg: 'linear-gradient(135deg,#fde8c8,#f5c897)', text: '#7a4a00' }
   };
-  const bg = phaseColors[data.phaseKey] || '#f9e4ef';
-  const updated = new Date(data.updatedAt).toLocaleDateString('fr-FR', { day:'numeric', month:'long', hour:'2-digit', minute:'2-digit' });
+  const phaseStyle = phaseColors[data.phaseKey] || phaseColors.follicular;
+  const updated = new Date(data.updatedAt).toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
+  const updatedDate = new Date(data.updatedAt).toLocaleDateString('fr-FR', { day:'numeric', month:'long' });
+
+  // Mini calendrier 7 jours (-3 à +3)
+  const dayNames = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
+  const phaseColorsCal = {
+    period: '#f2a7bb',
+    follicular: '#e8d4e5',
+    ovulation: '#c9a0c0',
+    luteal: '#fde8c8',
+    fertile: '#e8d4e5',
+    'risk-high': '#ffcccc',
+    'risk-low': '#ffe8cc',
+    predicted: '#f5f5f5'
+  };
+
+  let calHtml = '';
+  const today = new Date(); today.setHours(0,0,0,0);
+  for (let i = -3; i <= 3; i++) {
+    const d = new Date(today);
+    d.setDate(d.getDate() + i);
+    const dayName = dayNames[d.getDay()];
+    const dayNum = d.getDate();
+    const isToday = i === 0;
+
+    // Calculer le jour du cycle pour ce jour
+    const cycleDay = data.cycleDay + i;
+    const cl = data.cycleLength;
+    const ovDay = data.cycleDay + data.daysToOvul;
+    const pd = 5; // approximation
+
+    // Phase
+    let phase = 'follicular';
+    let calBg = phaseColorsCal.follicular;
+    if (cycleDay <= 0 || cycleDay > cl) {
+      calBg = '#f0f0f0';
+    } else if (cycleDay <= pd) {
+      calBg = phaseColorsCal.period;
+      phase = 'period';
+    } else if (cycleDay === ovDay) {
+      calBg = phaseColorsCal.ovulation;
+      phase = 'ovulation';
+    } else if (cycleDay >= ovDay - 4 && cycleDay <= ovDay - 1) {
+      calBg = phaseColorsCal.fertile;
+      phase = 'fertile';
+    } else if (cycleDay > ovDay) {
+      calBg = phaseColorsCal.luteal;
+      phase = 'luteal';
+    }
+
+    const border = isToday ? 'border:2px solid #6b3a5e;' : 'border:2px solid transparent;';
+    const fontW = isToday ? 'font-weight:800;' : 'font-weight:500;';
+
+    calHtml += `
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+        <div style="font-size:0.65rem;color:#9a5a8a;${fontW}">${dayName}</div>
+        <div style="width:36px;height:36px;border-radius:50%;background:${calBg};${border}display:flex;align-items:center;justify-content:center;font-size:0.78rem;font-weight:700;color:#6b3a5e;">${dayNum}</div>
+        <div style="font-size:0.6rem;color:#bbb;">${cycleDay > 0 && cycleDay <= cl ? 'J'+cycleDay : ''}</div>
+      </div>`;
+  }
 
   // Humeur
   const moodHtml = data.mood
-    ? `<div style="display:flex;align-items:center;gap:8px;margin-top:12px;padding:10px 14px;background:#fdf6f9;border-radius:12px;">
-        <div style="font-size:0.78rem;color:#9a5a8a;font-weight:600;">Humeur aujourd'hui</div>
-        <div style="font-size:0.82rem;color:#6b3a5e;font-weight:700;margin-left:auto;">${data.mood}</div>
-       </div>`
-    : '';
+    ? `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(107,58,94,0.1);">
+        <span style="font-size:0.82rem;color:#9a5a8a;">Humeur</span>
+        <span style="font-size:0.85rem;font-weight:700;color:#6b3a5e;">${data.mood}</span>
+      </div>` : '';
 
   // Fenêtre fertile
-  const fertileHtml = `
-    <div style="display:flex;align-items:center;gap:8px;margin-top:8px;padding:10px 14px;background:#fdf6f9;border-radius:12px;">
-      <div style="font-size:0.78rem;color:#9a5a8a;font-weight:600;">Fenêtre fertile</div>
-      <div style="font-size:0.82rem;color:#6b3a5e;font-weight:700;margin-left:auto;">${data.fertileMsg || '—'}</div>
-    </div>`;
+  const fertileHtml = `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(107,58,94,0.1);">
+    <span style="font-size:0.82rem;color:#9a5a8a;">Fenêtre fertile</span>
+    <span style="font-size:0.85rem;font-weight:700;color:#6b3a5e;">${data.fertileMsg || '—'}</span>
+  </div>`;
+
+  // Prochaines règles
+  const nextPeriodHtml = data.daysToNextPeriod > 0
+    ? `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(107,58,94,0.1);">
+        <span style="font-size:0.82rem;color:#9a5a8a;">Prochaines règles</span>
+        <span style="font-size:0.85rem;font-weight:700;color:#6b3a5e;">Dans ${data.daysToNextPeriod} jour${data.daysToNextPeriod > 1 ? 's' : ''}</span>
+      </div>` : '';
 
   // Fertilité
   const fertilityHtml = data.wantsToConceive && data.fertilityPct !== null
-    ? `<div style="display:flex;align-items:center;gap:8px;margin-top:8px;padding:10px 14px;background:#fdf6f9;border-radius:12px;">
-        <div style="font-size:0.78rem;color:#9a5a8a;font-weight:600;">Chances de conception</div>
-        <div style="font-size:0.82rem;color:#6b3a5e;font-weight:700;margin-left:auto;">${data.fertilityPct}%</div>
-       </div>`
-    : '';
+    ? `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(107,58,94,0.1);">
+        <span style="font-size:0.82rem;color:#9a5a8a;">Chances de conception</span>
+        <span style="font-size:0.85rem;font-weight:700;color:#6b3a5e;">${data.fertilityPct}%</span>
+      </div>` : '';
 
   // Tests récents
   let testsHtml = '';
@@ -5162,38 +5251,51 @@ function renderPartnerContent(data) {
     const rows = data.recentTests.map(t => {
       const d = new Date(t.date + 'T12:00').toLocaleDateString('fr-FR', { day:'numeric', month:'short' });
       const r = t.result === 'positive' ? '✅ Positif' : '❌ Négatif';
-      return `<div style="display:flex;justify-content:space-between;font-size:0.78rem;padding:4px 0;border-bottom:1px solid #f0e8f5;">
+      return `<div style="display:flex;justify-content:space-between;font-size:0.78rem;padding:6px 0;border-bottom:1px solid rgba(107,58,94,0.06);">
         <span style="color:#9a5a8a;">${d}</span>
         <span style="color:#6b3a5e;font-weight:600;">${r}</span>
       </div>`;
     }).join('');
     testsHtml = `
-      <div style="margin-top:16px;">
-        <div style="font-size:0.78rem;font-weight:700;color:#9a5a8a;margin-bottom:8px;">Tests d'ovulation récents</div>
+      <div style="margin-top:4px;">
+        <div style="font-size:0.75rem;font-weight:700;color:#9a5a8a;margin-bottom:6px;padding-top:10px;">Tests d'ovulation récents</div>
         ${rows}
       </div>`;
   }
 
-  // Prochaines règles
-  const nextPeriodHtml = data.daysToNextPeriod > 0
-    ? `<div style="display:flex;align-items:center;gap:8px;margin-top:8px;padding:10px 14px;background:#fdf6f9;border-radius:12px;">
-        <div style="font-size:0.78rem;color:#9a5a8a;font-weight:600;">Prochaines règles</div>
-        <div style="font-size:0.82rem;color:#6b3a5e;font-weight:700;margin-left:auto;">Dans ${data.daysToNextPeriod} jour${data.daysToNextPeriod > 1 ? 's' : ''}</div>
-       </div>`
-    : '';
-
   document.getElementById('partner-content').innerHTML = `
-    <div style="background:white;border-radius:24px;padding:24px;box-shadow:0 4px 24px rgba(107,58,94,0.1);margin-bottom:12px;">
-      <div style="font-size:1.1rem;font-weight:700;color:#6b3a5e;margin-bottom:6px;">${data.name}</div>
-      <div style="display:inline-block;background:${bg};border-radius:20px;padding:4px 14px;font-size:0.78rem;font-weight:600;color:#6b3a5e;margin-bottom:12px;">${data.phase} — J${data.cycleDay} / ${data.cycleLength}</div>
+    <!-- Header phase -->
+    <div style="background:${phaseStyle.bg};border-radius:24px;padding:24px;margin-bottom:12px;text-align:center;">
+      <div style="font-size:1.3rem;font-weight:800;color:${phaseStyle.text};margin-bottom:2px;">${data.name}</div>
+      <div style="font-size:0.85rem;color:${phaseStyle.text};opacity:0.85;margin-bottom:12px;">${data.phase}</div>
+      <div style="font-size:2.2rem;font-weight:900;color:${phaseStyle.text};">J${data.cycleDay}</div>
+      <div style="font-size:0.75rem;color:${phaseStyle.text};opacity:0.7;">sur ${data.cycleLength} jours</div>
+    </div>
+
+    <!-- Mini calendrier -->
+    <div style="background:white;border-radius:20px;padding:16px;margin-bottom:12px;box-shadow:0 2px 12px rgba(107,58,94,0.08);">
+      <div style="font-size:0.75rem;font-weight:700;color:#9a5a8a;margin-bottom:12px;">7 prochains jours</div>
+      <div style="display:flex;justify-content:space-between;gap:4px;">
+        ${calHtml}
+      </div>
+    </div>
+
+    <!-- Infos -->
+    <div style="background:white;border-radius:20px;padding:16px 20px;margin-bottom:12px;box-shadow:0 2px 12px rgba(107,58,94,0.08);">
       ${moodHtml}
       ${fertileHtml}
       ${fertilityHtml}
       ${nextPeriodHtml}
       ${testsHtml}
-      <div style="margin-top:16px;font-size:0.85rem;color:#666;line-height:1.6;border-top:1px solid #f0e8f5;padding-top:14px;">${data.tip}</div>
     </div>
-    <div style="text-align:center;font-size:0.7rem;color:#bbb;">Mis à jour le ${updated}</div>
+
+    <!-- Conseil -->
+    <div style="background:white;border-radius:20px;padding:16px 20px;margin-bottom:12px;box-shadow:0 2px 12px rgba(107,58,94,0.08);">
+      <div style="font-size:0.75rem;font-weight:700;color:#9a5a8a;margin-bottom:8px;">Conseil</div>
+      <div style="font-size:0.85rem;color:#555;line-height:1.6;">${data.tip}</div>
+    </div>
+
+    <div style="text-align:center;font-size:0.68rem;color:#bbb;">Mis à jour le ${updatedDate} à ${updated}</div>
   `;
 }
 
